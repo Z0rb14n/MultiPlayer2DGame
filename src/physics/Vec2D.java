@@ -83,7 +83,15 @@ public class Vec2D implements Serializable {
 
     public Vec2D normalize() {
         float mag = mag();
+        if (mag == 0) {
+            //System.out.println("Warning: Normalizing zero vector; returning zero vector");
+            return ZERO;
+        }
         return new Vec2D(x/mag,y/mag);
+    }
+
+    public Vec2D scaleTo(float mag) {
+        return normalize().mult(mag);
     }
 
     public Vec2D copy() {

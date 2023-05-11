@@ -21,8 +21,7 @@ public class PhysicsEngine {
     }
 
     public void add(ConvexShape shape) {
-        PhysicsObject po = new PhysicsObject(shape);
-        tree.insert(po, shape);
+        add(new PhysicsObject(shape));
     }
 
     public void add(PhysicsObject object) {
@@ -63,6 +62,7 @@ public class PhysicsEngine {
     }
 
     private void handleCollision(QuadTreeEntry<PhysicsObject> obj1, QuadTreeEntry<PhysicsObject> obj2) {
+        if ((obj1.getObject().getCollisionMask() & obj2.getObject().getCollisionMask()) == 0) return;
         Vec2D mtv = SATTest.getMTV(obj1.getObject().getTranslatedShape(), obj2.getObject().getTranslatedShape());
         if (mtv == null) return;
         // https://cs.brown.edu/courses/cs1971/lectures/lecture05.pdf

@@ -4,8 +4,6 @@ import physics.CollisionListener;
 import physics.PhysicsEngine;
 import physics.PhysicsObject;
 import physics.Vec2D;
-import physics.broad.QuadTree;
-import physics.broad.QuadTreeNode;
 import physics.shape.AxisAlignedBoundingBox;
 import physics.shape.Circle;
 import physics.shape.Triangle;
@@ -33,10 +31,10 @@ public class EngineTestUIFrame extends SimpleTestFrame {
     }
 
     private static class EngineTestUIPanel extends JPanel implements KeyListener, MouseMotionListener, ActionListener, CollisionListener {
-        private ArrayList<AxisAlignedBoundingBox> boxes = new ArrayList<>();
-        private ArrayList<Circle> circles = new ArrayList<>();
-        private PhysicsEngine engine = new PhysicsEngine(new Vec2D(800,600));
-        private PhysicsObject triangle;
+        private final ArrayList<AxisAlignedBoundingBox> boxes = new ArrayList<>();
+        private final ArrayList<Circle> circles = new ArrayList<>();
+        private final PhysicsEngine engine = new PhysicsEngine(new Vec2D(800,600));
+        private final PhysicsObject triangle;
         private Vec2D prevMTV = Vec2D.ZERO;
         public EngineTestUIPanel() {
             super();
@@ -61,25 +59,6 @@ public class EngineTestUIFrame extends SimpleTestFrame {
             triangle = new PhysicsObject(new Triangle(new Vec2D(-10,0), new Vec2D(10,0), new Vec2D(0,20)), new Vec2D(400,400), false);
             triangle.addListener(this);
             engine.add(triangle);
-        }
-
-        private void drawTree(Graphics2D g, QuadTree<?> tree) {
-            g.setColor(Color.BLACK);
-            g.drawRect((int)tree.getRoot().getBottomLeft().getX(), (int)tree.getRoot().getBottomLeft().getY(), (int)tree.getRoot().getSize().getX(), (int)tree.getRoot().getSize().getY());
-            if (tree.getRoot().getChildren() != null) {
-                for (QuadTreeNode<?> child : tree.getRoot().getChildren()) {
-                    drawTree(g, child);
-                }
-            }
-        }
-        private void drawTree(Graphics2D g, QuadTreeNode<?> tree) {
-            g.setColor(Color.BLACK);
-            g.drawRect((int)tree.getBottomLeft().getX(), (int)tree.getBottomLeft().getY(), (int)tree.getSize().getX(), (int)tree.getSize().getY());
-            if (tree.getChildren() != null) {
-                for (QuadTreeNode<?> child : tree.getChildren()) {
-                    drawTree(g, child);
-                }
-            }
         }
 
         @Override
@@ -108,7 +87,7 @@ public class EngineTestUIFrame extends SimpleTestFrame {
             graphics.setStroke(new BasicStroke(3));
             graphics.drawLine((int)vertexOne.getX(), (int)vertexOne.getY(), (int)vertexTwo.getX(), (int)vertexTwo.getY());
 
-            drawTree(graphics, engine.getTree());
+            QuadTreeRender.drawTree(graphics, engine.getTree());
         }
 
         private void fillTriangle(Triangle triangle, Graphics2D graphics) {
@@ -128,7 +107,7 @@ public class EngineTestUIFrame extends SimpleTestFrame {
 
         }
 
-        private HashSet<Integer> pressedKeys = new HashSet<>();
+        private final HashSet<Integer> pressedKeys = new HashSet<>();
 
         @Override
         public void keyPressed(KeyEvent e) {

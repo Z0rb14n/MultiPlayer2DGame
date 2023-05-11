@@ -13,6 +13,7 @@ public class PhysicsObject {
     private boolean awake;
     private float mass = 1;
     private float coefOfRestitution = 1f;
+    private int collisionMask = 0xffffffff;
 
     private ArrayList<CollisionListener> collisionListeners = new ArrayList<>();
 
@@ -74,6 +75,14 @@ public class PhysicsObject {
 
     public float getCoefOfRestitution() {
         return coefOfRestitution;
+    }
+
+    public int getCollisionMask() {
+        return collisionMask;
+    }
+
+    public void setCollisionMask(int collisionMask) {
+        this.collisionMask = collisionMask;
     }
 
     public void setCoefOfRestitution(float coefOfRestitution) {
