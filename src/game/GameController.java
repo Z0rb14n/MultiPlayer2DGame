@@ -1,4 +1,4 @@
-package util;
+package game;
 
 import physics.PhysicsEngine;
 import physics.PhysicsObject;
@@ -6,8 +6,7 @@ import physics.Vec2D;
 import physics.shape.AxisAlignedBoundingBox;
 
 import java.awt.*;
-import java.awt.geom.Area;
-import java.util.Stack;
+import java.util.ArrayList;
 
 /**
  * Represents the game controller
@@ -15,7 +14,10 @@ import java.util.Stack;
 public class GameController {
     public static final int GAME_WIDTH = 800;
     public static final int GAME_HEIGHT = 400;
-    private PhysicsEngine engine;
+    private final PhysicsEngine engine;
+    private final ArrayList<Vehicle> vehicles = new ArrayList<>();
+    private final ArrayList<Ball> balls = new ArrayList<>();
+    private final Vehicle player;
     private static int GAME_SPEED = 3;
     private static GameController singleton;
     //<editor-fold desc="Static Methods">
@@ -41,6 +43,11 @@ public class GameController {
     private GameController() {
         engine = new PhysicsEngine(new Vec2D(GAME_WIDTH+100, GAME_HEIGHT+100));
         createBoundingBoxes();
+        // create test vehicle
+        Vehicle v = new Vehicle(new Vec2D(100,100));
+        vehicles.add(v);
+        player = v;
+        engine.add(v.getPhysicsObject());
     }
 
     private void createBoundingBoxes() {
@@ -58,8 +65,33 @@ public class GameController {
         engine.add(rightObj);
     }
 
+    public void removeBall(Ball ball) {
+        engine.getTree().remove(ball.getPhysicsObject());
+        balls.remove(ball);
+    }
+
+    public void createBall() {
+        Vec2D playerPos = player.getPhysicsObject().getPosition();
+        Vec2D playerVel = player.getPhysicsObject().getVelocity();
+        Vec2D ballPos = playerPos.add(playerVel.normalize().scaleTo(10));
+        Ball ball = new Ball(ballPos);
+        balls.add(ball);
+        ball.getPhysicsObject().setVelocity(playerVel.add(playerVel.normalize().scaleTo(10)));
+        engine.add(ball.getPhysicsObject());
+    }
+
+    public Vehicle getPlayer() {
+        return player;
+    }
+
     public void render(Graphics2D g) {
         renderBounds(g);
+        for (Vehicle v : vehicles) {
+            v.render(g);
+        }
+        for (Ball b : balls) {
+            b.render(g);
+        }
     }
 
     private void renderBounds(Graphics2D g) {

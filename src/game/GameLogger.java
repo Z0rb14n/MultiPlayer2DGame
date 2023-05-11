@@ -1,4 +1,4 @@
-package util;
+package game;
 
 public class GameLogger {
     private static GameLogger singleton;

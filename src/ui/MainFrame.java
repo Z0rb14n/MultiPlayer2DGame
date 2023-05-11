@@ -1,6 +1,6 @@
 package ui;
 
-import util.GameController;
+import game.GameController;
 
 import javax.swing.*;
 import java.awt.*;
@@ -27,8 +27,8 @@ class MainFrame extends JFrame {
     }
 
     private void update() {
-        repaint();
         mp.update();
+        repaint();
     }
 
     public static void main(String[] args) {
