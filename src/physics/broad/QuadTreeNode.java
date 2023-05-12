@@ -122,11 +122,14 @@ public class QuadTreeNode<T> {
         return result;
     }
 
-    public void remove(T object) {
+    public void remove(T object, Vec2D objBleft, Vec2D objSize) {
+        if (!getAABB().overlaps(new AxisAlignedBoundingBox(objBleft,objBleft.add(objSize)))) {
+            return;
+        }
         if (children != null) {
             boolean shouldBeAwake = false;
             for (int i = 0; i < 4; i++) {
-                children.get(i).remove(object);
+                children.get(i).remove(object, objBleft, objSize);
                 if (children.get(i).hasAttribute(PhysicsEngine.AWAKE_ATTRIBUTE)) shouldBeAwake = true;
             }
             if (!shouldBeAwake) removeAttribute(PhysicsEngine.AWAKE_ATTRIBUTE);

@@ -6,11 +6,13 @@ import physics.broad.QuadTreeNode;
 import physics.narrow.SATTest;
 import physics.shape.ConvexShape;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class PhysicsEngine {
     public static final Object AWAKE_ATTRIBUTE = "a";
     private final QuadTree<PhysicsObject> tree;
+    private final ArrayList<PhysicsObject> removalQueue = new ArrayList<>();
 
     public PhysicsEngine(Vec2D dim) {
         tree = new QuadTree<>(dim, 5, 6);
@@ -28,8 +30,22 @@ public class PhysicsEngine {
         tree.insert(object, object.getTranslatedShape());
     }
 
+    public void remove(PhysicsObject object) {
+        removalQueue.add(object);
+    }
+
+    public void removeImmediate(PhysicsObject object) {
+        tree.remove(object, object.getTranslatedShape());
+    }
+
+    private ArrayList<PhysicsObject> objectUpdateQueue = new ArrayList<>();
+
     public void update(float dt) {
         update(tree.getRoot(), dt);
+        for (PhysicsObject object : removalQueue) {
+            removeImmediate(object);
+        }
+        removalQueue.clear();
     }
 
     private void update(QuadTreeNode<PhysicsObject> node, float dt) {
@@ -39,7 +55,7 @@ public class PhysicsEngine {
             for (int i = 0; i < contents.size(); i++) {
                 QuadTreeEntry<PhysicsObject> obj = contents.get(i);
                 boolean hasMoved = obj.getObject().update(dt);
-                if (hasMoved) {
+                if (hasMoved && !node.getAABB().contains(obj.getObject().getTranslatedShape().getAABB())) {
                     tree.update(obj.getObject(), obj.getObject().getTranslatedShape());
                 }
             }

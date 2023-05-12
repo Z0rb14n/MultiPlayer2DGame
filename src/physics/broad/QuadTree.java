@@ -31,8 +31,13 @@ public class QuadTree<T> {
         root.insert(object, objBleft, objSize, maxDepth, maxSize);
     }
 
-    public void remove(T object) {
-        root.remove(object);
+    public void remove(T object, ConvexShape shape) {
+        AxisAlignedBoundingBox box = shape.getAABB();
+        remove(object, box.getBottomLeft(), box.getSize());
+    }
+
+    public void remove(T object, Vec2D objBleft, Vec2D objSize) {
+        root.remove(object, objBleft, objSize);
     }
 
     public void update(T object, ConvexShape shape) {
@@ -41,7 +46,7 @@ public class QuadTree<T> {
     }
 
     private void update(T object, Vec2D bottomLeft, Vec2D size) {
-        remove(object);
+        remove(object, bottomLeft, size);
         insert(object, bottomLeft, size);
     }
 

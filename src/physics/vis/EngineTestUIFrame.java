@@ -137,18 +137,19 @@ public class EngineTestUIFrame extends SimpleTestFrame {
 
         @Override
         public void actionPerformed(ActionEvent e) {
+            float forceStrength = 0.1f;
             Vec2D force = new Vec2D(0,0);
             if (pressedKeys.contains(KeyEvent.VK_W)) {
-                force = force.add(new Vec2D(0,-1));
+                force = force.add(new Vec2D(0,-forceStrength));
             }
             if (pressedKeys.contains(KeyEvent.VK_A)) {
-                force = force.add(new Vec2D(-1,0));
+                force = force.add(new Vec2D(-forceStrength,0));
             }
             if (pressedKeys.contains(KeyEvent.VK_S)) {
-                force = force.add(new Vec2D(0,1));
+                force = force.add(new Vec2D(0,forceStrength));
             }
             if (pressedKeys.contains(KeyEvent.VK_D)) {
-                force = force.add(new Vec2D(1,0));
+                force = force.add(new Vec2D(forceStrength,0));
             }
             if (Vec2D.ZERO.equals(force)) {
                 if (triangle.getVelocity().sqMag() < 0.1) {

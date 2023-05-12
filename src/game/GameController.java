@@ -51,7 +51,7 @@ public class GameController {
     }
 
     public void removeBall(Ball ball) {
-        engine.getTree().remove(ball.getPhysicsObject());
+        engine.remove(ball.getPhysicsObject());
         balls.remove(ball);
     }
 
