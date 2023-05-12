@@ -28,9 +28,12 @@ public class Ball implements CollisionListener {
         numCollisions++;
         //System.out.println("Circle collision");
         if (numCollisions > 10) {
-            circle.removeListener(this);
             GameController.getInstance().removeBall(this);
         }
+    }
+
+    protected void finalize() {
+        System.out.println("Ball finalized");
     }
 
     public void render(Graphics2D g) {

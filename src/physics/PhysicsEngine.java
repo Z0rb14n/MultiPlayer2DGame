@@ -36,7 +36,7 @@ public class PhysicsEngine {
         if (!node.hasAttribute(AWAKE_ATTRIBUTE)) return;
         if (node.getChildren() == null) {
             List<QuadTreeEntry<PhysicsObject>> contents = node.getContents();
-            for (int i = 0, contentsSize = contents.size(); i < contentsSize; i++) {
+            for (int i = 0; i < contents.size(); i++) {
                 QuadTreeEntry<PhysicsObject> obj = contents.get(i);
                 boolean hasMoved = obj.getObject().update(dt);
                 if (hasMoved) {
