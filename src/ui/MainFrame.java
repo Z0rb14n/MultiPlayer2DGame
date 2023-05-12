@@ -32,6 +32,7 @@ class MainFrame extends JFrame {
     }
 
     public static void main(String[] args) {
-        getInstance();
+        @SuppressWarnings("unused")
+        MainFrame frame = getInstance();
     }
 }

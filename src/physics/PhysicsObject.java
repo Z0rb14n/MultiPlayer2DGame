@@ -11,16 +11,17 @@ public class PhysicsObject {
     private Vec2D velocity;
     private boolean stationary;
     private boolean awake;
-    private float mass = 1;
+    private float mass;
     private float coefOfRestitution = 1f;
     private int collisionMask = 0xffffffff;
 
-    private ArrayList<CollisionListener> collisionListeners = new ArrayList<>();
+    private final ArrayList<CollisionListener> collisionListeners = new ArrayList<>();
 
     public PhysicsObject(ConvexShape shape) {
         this(shape,Vec2D.ZERO,false);
     }
 
+    @SuppressWarnings("unused")
     public PhysicsObject(ConvexShape shape, Vec2D position) {
         this(shape,position,false);
     }
@@ -35,6 +36,7 @@ public class PhysicsObject {
         this.mass = 1;
     }
 
+    @SuppressWarnings("unused")
     public PhysicsObject(ConvexShape shape, Vec2D position, float mass) {
         this.shape = shape.copy();
         this.translatedShape = shape.copy();
@@ -95,23 +97,27 @@ public class PhysicsObject {
         translatedShape.translate(position);
     }
 
+    @SuppressWarnings("unused")
     public void setStationary(boolean stationary) {
         this.stationary = stationary;
         if (stationary) velocity = Vec2D.ZERO;
         if (stationary) awake = false;
     }
 
+    @SuppressWarnings("unused")
     public void setPosition(Vec2D position) {
         this.position = position;
         translatedShape = shape.copy();
         translatedShape.translate(position);
     }
 
+    @SuppressWarnings("unused")
     public void setVelocity(Vec2D velocity) {
         this.velocity = velocity;
         if (!velocity.equals(Vec2D.ZERO)) awake = true;
     }
 
+    @SuppressWarnings("unused")
     public void setMass(float mass) {
         this.mass = mass;
     }
@@ -120,10 +126,12 @@ public class PhysicsObject {
         collisionListeners.add(listener);
     }
 
+    @SuppressWarnings("unused")
     public void removeListener(CollisionListener listener) {
         collisionListeners.remove(listener);
     }
 
+    @SuppressWarnings("unused")
     public void clearListeners() {
         collisionListeners.clear();
     }

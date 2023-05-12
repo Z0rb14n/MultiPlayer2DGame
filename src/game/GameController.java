@@ -20,25 +20,10 @@ public class GameController {
     private final Vehicle player;
     private static int GAME_SPEED = 3;
     private static GameController singleton;
-    //<editor-fold desc="Static Methods">
     public static GameController getInstance() {
         if (singleton == null) singleton = new GameController();
         return singleton;
     }
-    static int gameRightBound() {
-        return GAME_WIDTH;
-    }
-    static int gameBottomBound() {
-        return GAME_HEIGHT;
-    }
-    static int gameTopBound() {
-        return 0;
-    }
-    static int gameLeftBound() {
-        return 0;
-    }
-
-    //</editor-fold>
 
     private GameController() {
         engine = new PhysicsEngine(new Vec2D(GAME_WIDTH+100, GAME_HEIGHT+100));
@@ -101,8 +86,5 @@ public class GameController {
 
     public void update() {
         engine.update(1/60f * GAME_SPEED);
-    }
-
-    public void reset() {
     }
 }

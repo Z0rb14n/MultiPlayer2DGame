@@ -36,6 +36,7 @@ class MainPanel extends JPanel implements KeyListener {
     }
 
     private void handleAction(Action pop) {
+        //noinspection SwitchStatementWithTooFewBranches
         switch (pop) {
             case CREATE_BALL:
                 controller.createBall();

@@ -6,18 +6,25 @@ import java.util.Objects;
 public class Vec2D implements Serializable {
     private static final long serialVersionUID = 69420L;
     public static final Vec2D ZERO = new Vec2D(0,0);
+    @SuppressWarnings("unused")
     public static final Vec2D UP = new Vec2D(0,-1);
+    @SuppressWarnings("unused")
     public static final Vec2D DOWN = new Vec2D(0,1);
+    @SuppressWarnings("unused")
     public static final Vec2D LEFT = new Vec2D(-1,0);
+    @SuppressWarnings("unused")
     public static final Vec2D RIGHT = new Vec2D(1,0);
-    private float x;
-    private float y;
+    private final float x;
+    private final float y;
 
+    @SuppressWarnings("unused")
     public static double dist(Vec2D v1, Vec2D v2) {
         float dx = v1.x - v2.x;
         float dy = v1.y - v2.y;
         return Math.sqrt((dx * dx) + (dy * dy));
     }
+
+    @SuppressWarnings("unused")
     public static Vec2D reflect(Vec2D L, Vec2D N) {
         return L.sub(N.mult(2*L.dot(N)));
     }
@@ -60,6 +67,7 @@ public class Vec2D implements Serializable {
     }
 
     public Vec2D perp() {
+        //noinspection SuspiciousNameCombination
         return new Vec2D(-y,x);
     }
 

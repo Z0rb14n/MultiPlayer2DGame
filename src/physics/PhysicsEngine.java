@@ -10,7 +10,7 @@ import java.util.List;
 
 public class PhysicsEngine {
     public static final Object AWAKE_ATTRIBUTE = "a";
-    private QuadTree<PhysicsObject> tree;
+    private final QuadTree<PhysicsObject> tree;
 
     public PhysicsEngine(Vec2D dim) {
         tree = new QuadTree<>(dim, 5, 6);
