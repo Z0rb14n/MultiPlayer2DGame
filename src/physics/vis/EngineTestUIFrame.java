@@ -57,7 +57,7 @@ public class EngineTestUIFrame extends SimpleTestFrame {
             }
 
             triangle = new PhysicsObject(new Triangle(new Vec2D(-10,0), new Vec2D(10,0), new Vec2D(0,20)), new Vec2D(400,400), false);
-            triangle.addListener(this);
+            triangle.addCollisionListener(this);
             engine.add(triangle);
         }
 

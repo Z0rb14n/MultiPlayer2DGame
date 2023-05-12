@@ -1,6 +1,7 @@
 package ui;
 
 import game.GameController;
+import game.GameLogger;
 import physics.PhysicsObject;
 import physics.Vec2D;
 
@@ -26,13 +27,13 @@ class MainPanel extends JPanel implements KeyListener {
             handleAction(queuedActions.pop());
         }
         handleInputs();
-        //long start = System.nanoTime();
+        long start = System.nanoTime();
         controller.update();
-        //long physUpdate = System.nanoTime();
-        //System.out.println("Physics update took " + (physUpdate - start) / 1000000f + "ms");
+        long physUpdate = System.nanoTime();
+        GameLogger.getDefault().log("Physics update took " + (physUpdate - start) / 1000000f + "ms","PERFORMANCE");
         repaint();
-        //long render = System.nanoTime();
-        //System.out.println("Render took " + (render - physUpdate) / 1000000f + "ms");
+        long render = System.nanoTime();
+        GameLogger.getDefault().log("Render took " + (render - physUpdate) / 1000000f + "ms","PERFORMANCE");
     }
 
     private void handleAction(Action pop) {

@@ -1,5 +1,7 @@
 package physics;
 
+import game.GameLogger;
+
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -22,11 +24,6 @@ public class Vec2D implements Serializable {
         float dx = v1.x - v2.x;
         float dy = v1.y - v2.y;
         return Math.sqrt((dx * dx) + (dy * dy));
-    }
-
-    @SuppressWarnings("unused")
-    public static Vec2D reflect(Vec2D L, Vec2D N) {
-        return L.sub(N.mult(2*L.dot(N)));
     }
 
     public Vec2D() {
@@ -92,7 +89,7 @@ public class Vec2D implements Serializable {
     public Vec2D normalize() {
         float mag = mag();
         if (mag == 0) {
-            //System.out.println("Warning: Normalizing zero vector; returning zero vector");
+            GameLogger.getDefault().log("Warning: Normalizing zero vector; returning zero vector","VEC2D_DEBUG");
             return ZERO;
         }
         return new Vec2D(x/mag,y/mag);

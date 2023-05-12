@@ -13,7 +13,7 @@ public class Vehicle implements CollisionListener {
 
     public Vehicle(Vec2D start) {
         triangle = new PhysicsObject(new Triangle(new Vec2D(-10,0), new Vec2D(10,0), new Vec2D(0,20)), start, false);
-        triangle.addListener(this);
+        triangle.addCollisionListener(this);
         triangle.setCollisionMask(VEHICLE_COLLISION_MASK);
     }
 
@@ -23,7 +23,7 @@ public class Vehicle implements CollisionListener {
 
     @Override
     public void onCollision(PhysicsObject listenerTarget, PhysicsObject collider, Vec2D mtv) {
-        //System.out.println("Vehicle collision");
+        GameLogger.getDefault().log("Vehicle collision","VEHICLE_DEBUG");
     }
 
     public void render(Graphics2D g) {

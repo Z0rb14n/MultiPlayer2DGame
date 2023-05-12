@@ -161,8 +161,9 @@ public class PhysicsTestUIFrame extends SimpleTestFrame {
         public void mouseMoved(MouseEvent e) {
             Vec2D mousePos = new Vec2D(e.getX(), e.getY());
             mousePos = mousePos.sub(triangleOne.getVertices()[0]);
+            ConvexShape prev = triangleOne.copy();
             triangleOne.translate(mousePos);
-            tree.update(triangleOne, triangleOne);
+            tree.update(triangleOne, prev, triangleOne);
             repaint();
         }
     }

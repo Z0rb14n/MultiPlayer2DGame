@@ -2,6 +2,8 @@ package physics.shape;
 
 import physics.Vec2D;
 
+import java.util.Objects;
+
 // See https://cs.brown.edu/courses/cs1971/lectures/lecture05.pdf
 public class Circle extends ConvexShape {
     private float radius;
@@ -91,5 +93,10 @@ public class Circle extends ConvexShape {
             return radius == other.radius && center.equals(other.center);
         }
         return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(radius, center);
     }
 }

@@ -5,29 +5,37 @@ import physics.broad.QuadTreeEntry;
 import physics.broad.QuadTreeNode;
 import physics.narrow.SATTest;
 import physics.shape.ConvexShape;
+import util.Pair;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 public class PhysicsEngine {
     public static final Object AWAKE_ATTRIBUTE = "a";
+    private final SceneHierarchy hierarchy = new SceneHierarchy();
     private final QuadTree<PhysicsObject> tree;
     private final ArrayList<PhysicsObject> removalQueue = new ArrayList<>();
 
     public PhysicsEngine(Vec2D dim) {
-        tree = new QuadTree<>(dim, 5, 6);
+        this(dim, Vec2D.ZERO);
+    }
+
+    public PhysicsEngine(Vec2D dim, Vec2D bottomLeft) {
+        tree = new QuadTree<>(dim, bottomLeft, 5, 6);
     }
 
     public QuadTree<PhysicsObject> getTree() {
         return tree;
     }
 
-    public void add(ConvexShape shape) {
-        add(new PhysicsObject(shape));
+    public SceneHierarchy getHierarchy() {
+        return hierarchy;
     }
 
     public void add(PhysicsObject object) {
         tree.insert(object, object.getTranslatedShape());
+        hierarchy.addObject(object);
     }
 
     public void remove(PhysicsObject object) {
@@ -36,31 +44,32 @@ public class PhysicsEngine {
 
     public void removeImmediate(PhysicsObject object) {
         tree.remove(object, object.getTranslatedShape());
+        assert hierarchy.removeObject(object);
     }
 
-    private ArrayList<PhysicsObject> objectUpdateQueue = new ArrayList<>();
+    public void removeImmediateOOB(PhysicsObject object) {
+        tree.forceRemove(object);
+        assert hierarchy.removeObject(object);
+    }
+
 
     public void update(float dt) {
-        update(tree.getRoot(), dt);
+        ArrayList<Pair<PhysicsObject, ConvexShape>> objectUpdateQueue = hierarchy.physicsUpdate(dt);
+        for(Pair<PhysicsObject,ConvexShape> object : objectUpdateQueue) {
+            tree.update(object.getFirst(), object.getSecond(), object.getFirst().getTranslatedShape());
+        }
+        objectUpdateQueue.clear();
+        updateColStep(tree.getRoot());
         for (PhysicsObject object : removalQueue) {
             removeImmediate(object);
         }
         removalQueue.clear();
     }
 
-    private void update(QuadTreeNode<PhysicsObject> node, float dt) {
+    private void updateColStep(QuadTreeNode<PhysicsObject> node) {
         if (!node.hasAttribute(AWAKE_ATTRIBUTE)) return;
         if (node.getChildren() == null) {
-            List<QuadTreeEntry<PhysicsObject>> contents = node.getContents();
-            for (int i = 0; i < contents.size(); i++) {
-                QuadTreeEntry<PhysicsObject> obj = contents.get(i);
-                boolean hasMoved = obj.getObject().update(dt);
-                if (hasMoved && !node.getAABB().contains(obj.getObject().getTranslatedShape().getAABB())) {
-                    tree.update(obj.getObject(), obj.getObject().getTranslatedShape());
-                }
-            }
-            for (int i = 0; i < contents.size(); i++) {
-                QuadTreeEntry<PhysicsObject> obj1 = contents.get(i);
+            for (QuadTreeEntry<PhysicsObject> obj1 : node.getContents()) {
                 if (obj1.getObject().isStationary() || !obj1.getObject().isAwake()) continue;
                 for (QuadTreeEntry<PhysicsObject> obj2 : node.getContents()) {
                     if (obj1 != obj2) {
@@ -70,9 +79,8 @@ public class PhysicsEngine {
             }
         } else {
             List<QuadTreeNode<PhysicsObject>> children = node.getChildren();
-            for (int i = 0; i < children.size(); i++) {
-                QuadTreeNode<PhysicsObject> child = children.get(i);
-                update(child, dt);
+            for (QuadTreeNode<PhysicsObject> child : children) {
+                updateColStep(child);
             }
         }
     }

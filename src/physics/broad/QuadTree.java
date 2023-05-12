@@ -9,6 +9,7 @@ import java.util.ArrayList;
 // https://research.ncl.ac.uk/game/mastersdegree/gametechnologies/physicstutorials/6accelerationstructures/Physics%20-%20Spatial%20Acceleration%20Structures.pdf
 public class QuadTree<T> {
     private final QuadTreeNode<T> root;
+    private final Vec2D bLeft;
     private final int maxDepth;
     private final int maxSize;
 
@@ -17,7 +18,15 @@ public class QuadTree<T> {
     }
 
     public QuadTree(Vec2D size, int maxDepth, int maxSize) {
-        root = new QuadTreeNode<>(new Vec2D(0, 0), size);
+        bLeft = Vec2D.ZERO;
+        root = new QuadTreeNode<>(bLeft, size);
+        this.maxDepth = maxDepth;
+        this.maxSize = maxSize;
+    }
+
+    public QuadTree(Vec2D size, Vec2D bleft, int maxDepth, int maxSize) {
+        this.bLeft = bleft;
+        root = new QuadTreeNode<>(bLeft, size);
         this.maxDepth = maxDepth;
         this.maxSize = maxSize;
     }
@@ -28,7 +37,15 @@ public class QuadTree<T> {
     }
 
     public void insert(T object, Vec2D objBleft, Vec2D objSize) {
+        if (objBleft.getX() + objSize.getX() < bLeft.getX() || objBleft.getY() + objSize.getY() < bLeft.getY()) {
+            System.err.println("Object " + object + " placed in invalid position " + objBleft + " with size " + objSize);
+            objBleft = new Vec2D(Math.max(objBleft.getX(), 0), Math.max(objBleft.getY(), 0));
+        }
         root.insert(object, objBleft, objSize, maxDepth, maxSize);
+    }
+
+    public void forceRemove(T object) {
+        root.forceRemove(object);
     }
 
     public void remove(T object, ConvexShape shape) {
@@ -40,14 +57,11 @@ public class QuadTree<T> {
         root.remove(object, objBleft, objSize);
     }
 
-    public void update(T object, ConvexShape shape) {
-        AxisAlignedBoundingBox box = shape.getAABB();
-        update(object, box.getBottomLeft(), box.getSize());
-    }
-
-    private void update(T object, Vec2D bottomLeft, Vec2D size) {
-        remove(object, bottomLeft, size);
-        insert(object, bottomLeft, size);
+    public void update(T object, ConvexShape pre, ConvexShape post) {
+        AxisAlignedBoundingBox preBox = pre.getAABB();
+        AxisAlignedBoundingBox postBox = pre.getAABB();
+        remove(object, preBox.getBottomLeft(), preBox.getSize());
+        insert(object, postBox.getBottomLeft(), postBox.getSize());
     }
 
     public ArrayList<QuadTreeEntry<T>> findCloseObjects(ConvexShape shape) {

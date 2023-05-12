@@ -3,6 +3,7 @@ package physics;
 import physics.shape.ConvexShape;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class PhysicsObject {
     private ConvexShape shape;
@@ -17,11 +18,8 @@ public class PhysicsObject {
 
     private final ArrayList<CollisionListener> collisionListeners = new ArrayList<>();
 
-    public PhysicsObject(ConvexShape shape) {
-        this(shape,Vec2D.ZERO,false);
-    }
+    private final ArrayList<PhysicsUpdateListener> updateListeners = new ArrayList<>();
 
-    @SuppressWarnings("unused")
     public PhysicsObject(ConvexShape shape, Vec2D position) {
         this(shape,position,false);
     }
@@ -36,7 +34,6 @@ public class PhysicsObject {
         this.mass = 1;
     }
 
-    @SuppressWarnings("unused")
     public PhysicsObject(ConvexShape shape, Vec2D position, float mass) {
         this.shape = shape.copy();
         this.translatedShape = shape.copy();
@@ -122,13 +119,21 @@ public class PhysicsObject {
         this.mass = mass;
     }
 
-    public void addListener(CollisionListener listener) {
+    public void addCollisionListener(CollisionListener listener) {
         collisionListeners.add(listener);
     }
 
     @SuppressWarnings("unused")
-    public void removeListener(CollisionListener listener) {
+    public void removeCollisionListener(CollisionListener listener) {
         collisionListeners.remove(listener);
+    }
+
+    public void addUpdateListener(PhysicsUpdateListener listener) {
+        updateListeners.add(listener);
+    }
+
+    public void removeUpdateListener(PhysicsUpdateListener listener) {
+        updateListeners.remove(listener);
     }
 
     @SuppressWarnings("unused")
@@ -147,15 +152,37 @@ public class PhysicsObject {
         translatedShape.translate(translation);
     }
 
-    public boolean update(float dt) {
+    public boolean updated = false;
+
+    public boolean physicsUpdate(float dt) {
         if (awake && !stationary) {
+            if (updated) {
+                System.err.println("PhysicsObject.physicsUpdate() called twice in one frame");
+            }
+            updated = true;
             if (Vec2D.ZERO.equals(velocity)) {
                 awake = false;
             } else {
                 translate(velocity.mult(dt));
+                for(PhysicsUpdateListener listener : updateListeners) {
+                    listener.onPhysicsUpdate(this, dt);
+                }
                 return true;
             }
         }
         return false;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        PhysicsObject object = (PhysicsObject) o;
+        return stationary == object.stationary && Float.compare(object.mass, mass) == 0 && Float.compare(object.coefOfRestitution, coefOfRestitution) == 0 && collisionMask == object.collisionMask && Objects.equals(shape, object.shape) && Objects.equals(position, object.position) && Objects.equals(velocity, object.velocity);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(shape, position, velocity, stationary, mass, coefOfRestitution, collisionMask);
     }
 }
