@@ -92,9 +92,7 @@ public class QuadTreeNode<T> {
             contents.add(new QuadTreeEntry<>(object, objBleft, objSize));
             if (contents.size() > maxSize && depthLeft > 0) {
                 split();
-                //noinspection ForLoopReplaceableByForEach
-                for (int i = 0; i < contents.size(); i++) {
-                    QuadTreeEntry<T> entry = contents.get(i);
+                for (QuadTreeEntry<T> entry : contents) {
                     for (int j = 0; j < 4; j++) {
                         children.get(j).insert(entry.getObject(), entry.getBottomLeft(), entry.getSize(), depthLeft - 1, maxSize);
                     }
@@ -110,6 +108,9 @@ public class QuadTreeNode<T> {
         if (children != null) {
             for (int i = 0; i < 4; i++) {
                 result.addAll(children.get(i).findCloseObjects(objBleft, objSize));
+            }
+            if (contents != null && contents.size() != 0) {
+                System.out.println("???");
             }
         } else {
             for (QuadTreeEntry<T> entry : contents) {
@@ -134,7 +135,7 @@ public class QuadTreeNode<T> {
             for (int i = 0; i < contents.size(); i++) {
                 if (contents.get(i).getObject().equals(object)) {
                     contents.remove(i);
-                    return;
+                    break;
                 }
             }
             if (contents.size() == 0) removeAttribute(PhysicsEngine.AWAKE_ATTRIBUTE);
@@ -156,7 +157,7 @@ public class QuadTreeNode<T> {
             for (int i = 0; i < contents.size(); i++) {
                 if (contents.get(i).getObject().equals(object)) {
                     contents.remove(i);
-                    return;
+                    break;
                 }
             }
             if (contents.size() == 0) removeAttribute(PhysicsEngine.AWAKE_ATTRIBUTE);

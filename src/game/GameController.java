@@ -1,9 +1,10 @@
 package game;
 
-import physics.PhysicsEngine;
-import physics.PhysicsObject;
-import physics.Vec2D;
+import engine.*;
+import physics.*;
 import physics.shape.AxisAlignedBoundingBox;
+import physics.shape.Circle;
+import physics.shape.Triangle;
 import physics.vis.QuadTreeRender;
 
 import java.awt.*;
@@ -13,16 +14,15 @@ import java.util.ArrayList;
  * Represents the game controller
  */
 public class GameController {
+    public static int VEHICLE_COLLISION_MASK = 0b10;
+    public static int BALL_COLLISION_MASK = 0b01;
     public static final int GAME_WIDTH = 800;
     public static final int GAME_HEIGHT = 400;
     private final PhysicsEngine engine;
-    private final ArrayList<Vehicle> vehicles = new ArrayList<>();
-    private final ArrayList<Ball> balls = new ArrayList<>();
-    private final Vehicle player;
-    private AxisAlignedBoundingBox top;
-    private AxisAlignedBoundingBox bot;
-    private AxisAlignedBoundingBox left;
-    private AxisAlignedBoundingBox right;
+    private final ArrayList<GameObject> vehicles = new ArrayList<>();
+    private final ArrayList<GameObject> balls = new ArrayList<>();
+    private final SceneHierarchy hierarchy = new SceneHierarchy();
+    private final GameObject player;
     private static int GAME_SPEED = 3;
     private static GameController singleton;
     public static GameController getInstance() {
@@ -34,74 +34,85 @@ public class GameController {
         engine = new PhysicsEngine(new Vec2D(GAME_WIDTH+100, GAME_HEIGHT+100), new Vec2D(-50,-50));
         createBoundingBoxes();
         // create test vehicle
-        Vehicle v = new Vehicle(new Vec2D(100,100));
+        GameObject v = createVehicle(new Vec2D(100,100));
+        hierarchy.addObject(v);
         vehicles.add(v);
         player = v;
-        engine.add(v.getPhysicsObject());
+    }
+
+    private GameObject createVehicle(Vec2D position) {
+        Triangle triangle = new Triangle(new Vec2D(-10,0), new Vec2D(10,0), new Vec2D(0,20));
+        GameObject gameObject = new GameObject(position);
+        PhysicsBehaviour behaviour = new PhysicsBehaviour(gameObject,engine,triangle,false);
+        behaviour.setCollisionMask(VEHICLE_COLLISION_MASK);
+        gameObject.addBehaviour(behaviour);
+        TriangleRenderer renderer = new TriangleRenderer(gameObject, Color.RED, true);
+        gameObject.addBehaviour(renderer);
+        return gameObject;
+    }
+
+    private GameObject createBoundingBox(AxisAlignedBoundingBox box) {
+        GameObject gameObject = new GameObject();
+        PhysicsBehaviour behaviour = new PhysicsBehaviour(gameObject,engine,box,true);
+        gameObject.addBehaviour(behaviour);
+        BoxRenderer renderer = new BoxRenderer(gameObject, Color.BLACK, true);
+        gameObject.addBehaviour(renderer);
+        return gameObject;
     }
 
     private void createBoundingBoxes() {
-        top = new AxisAlignedBoundingBox(new Vec2D(-500,-500), new Vec2D(GAME_WIDTH+500,20));
-        bot = new AxisAlignedBoundingBox(new Vec2D(-500,GAME_HEIGHT-20), new Vec2D(GAME_WIDTH+500,GAME_HEIGHT+500));
-        left = new AxisAlignedBoundingBox(new Vec2D(-500,-500), new Vec2D(20,GAME_HEIGHT+500));
-        right = new AxisAlignedBoundingBox(new Vec2D(GAME_WIDTH-20,-500), new Vec2D(GAME_WIDTH+500,GAME_HEIGHT+500));
-        PhysicsObject topObj = new PhysicsObject(top, Vec2D.ZERO, true);
-        engine.add(topObj);
-        PhysicsObject botObj = new PhysicsObject(bot, Vec2D.ZERO, true);
-        engine.add(botObj);
-        PhysicsObject leftObj = new PhysicsObject(left, Vec2D.ZERO, true);
-        engine.add(leftObj);
-        PhysicsObject rightObj = new PhysicsObject(right, Vec2D.ZERO, true);
-        engine.add(rightObj);
+        AxisAlignedBoundingBox top = new AxisAlignedBoundingBox(new Vec2D(-500, -500), new Vec2D(GAME_WIDTH + 500, 20));
+        AxisAlignedBoundingBox bot = new AxisAlignedBoundingBox(new Vec2D(-500, GAME_HEIGHT - 20), new Vec2D(GAME_WIDTH + 500, GAME_HEIGHT + 500));
+        AxisAlignedBoundingBox left = new AxisAlignedBoundingBox(new Vec2D(-500, -500), new Vec2D(20, GAME_HEIGHT + 500));
+        AxisAlignedBoundingBox right = new AxisAlignedBoundingBox(new Vec2D(GAME_WIDTH - 20, -500), new Vec2D(GAME_WIDTH + 500, GAME_HEIGHT + 500));
+        hierarchy.addObject(createBoundingBox(top));
+        hierarchy.addObject(createBoundingBox(bot));
+        hierarchy.addObject(createBoundingBox(left));
+        hierarchy.addObject(createBoundingBox(right));
+
     }
 
-    public void forceRemoveBall(Ball ball) {
-        engine.removeImmediateOOB(ball.getPhysicsObject());
-        balls.remove(ball);
+    public void forceRemoveBall(GameObject ball) {
+        removeBall(ball);
+        ball.getBehaviour(PhysicsBehaviour.class).removeOOB();
     }
 
-    public void removeBall(Ball ball) {
-        engine.remove(ball.getPhysicsObject());
+    public void removeBall(GameObject ball) {
+        hierarchy.removeObject(ball);
         balls.remove(ball);
     }
 
     public void createBall() {
-        Vec2D playerPos = player.getPhysicsObject().getPosition();
-        Vec2D playerVel = player.getPhysicsObject().getVelocity();
+        Vec2D playerPos = player.getBehaviour(PhysicsBehaviour.class).getPosition();
+        Vec2D playerVel = player.getBehaviour(PhysicsBehaviour.class).getVelocity();
         Vec2D ballPos = playerPos.add(playerVel.normalize().scaleTo(10));
-        Ball ball = new Ball(ballPos);
-        balls.add(ball);
-        ball.getPhysicsObject().setVelocity(new Vec2D(100,100));
-        engine.add(ball.getPhysicsObject());
+        Circle circle = new Circle(Vec2D.ZERO,2);
+        GameObject go = new GameObject(ballPos);
+        PhysicsBehaviour behaviour = new PhysicsBehaviour(go, engine, circle, false);
+        behaviour.setCollisionMask(BALL_COLLISION_MASK);
+        behaviour.setVelocity(new Vec2D(100,100));
+        go.addBehaviour(behaviour);
+        BallBehaviour ballBehaviour = new BallBehaviour(go, hierarchy.getRoot());
+        go.addBehaviour(ballBehaviour);
+        CircleRenderer renderer = new CircleRenderer(go, Color.BLUE, false);
+        go.addBehaviour(renderer);
+        balls.add(go);
+        hierarchy.addObject(go);
     }
 
-    public Vehicle getPlayer() {
+    public GameObject getPlayer() {
         return player;
     }
 
     public void render(Graphics2D g) {
-        renderBounds(g);
-        for (Vehicle v : vehicles) {
-            v.render(g);
-        }
-        for (Ball b : balls) {
-            b.render(g);
-        }
+        Time.deltaTime = (System.nanoTime() - Time.lastRenderNano) / 1000000000f;
+        hierarchy.update();
+        hierarchy.render(g);
         QuadTreeRender.drawTree(g, engine.getTree());
-    }
-
-    private void renderBounds(Graphics2D g) {
-        g.setColor(Color.BLACK);
-        // use top, left, bot, right
-        g.fillRect((int)top.getBottomLeft().getX(), (int)top.getBottomLeft().getY(), (int)top.getWidth(), (int)top.getHeight());
-        g.fillRect((int)bot.getBottomLeft().getX(), (int)bot.getBottomLeft().getY(), (int)bot.getWidth(), (int)bot.getHeight());
-        g.fillRect((int)left.getBottomLeft().getX(), (int)left.getBottomLeft().getY(), (int)left.getWidth(), (int)left.getHeight());
-        g.fillRect((int)right.getBottomLeft().getX(), (int)right.getBottomLeft().getY(), (int)right.getWidth(), (int)right.getHeight());
-
-
+        Time.lastRenderNano = System.nanoTime();
     }
 
     public void update() {
-        engine.update(1/60f * GAME_SPEED);
+        engine.update(1/165f * GAME_SPEED);
     }
 }

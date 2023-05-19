@@ -2,7 +2,7 @@ package ui;
 
 import game.GameController;
 import game.GameLogger;
-import physics.PhysicsObject;
+import engine.PhysicsBehaviour;
 import physics.Vec2D;
 
 import javax.swing.*;
@@ -69,7 +69,7 @@ class MainPanel extends JPanel implements KeyListener {
         if (pressedKeyCodes.contains(KeyEvent.VK_D)) {
             force = force.add(new Vec2D(forceAmount,0));
         }
-        PhysicsObject triangle = controller.getPlayer().getPhysicsObject();
+        PhysicsBehaviour triangle = controller.getPlayer().getBehaviour(PhysicsBehaviour.class);
         if (Vec2D.ZERO.equals(force)) {
             if (triangle.getVelocity().sqMag() < 0.1) {
                 triangle.setVelocity(Vec2D.ZERO);

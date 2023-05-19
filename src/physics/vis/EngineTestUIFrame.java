@@ -1,8 +1,8 @@
 package physics.vis;
 
-import physics.CollisionListener;
+import engine.GameObject;
 import physics.PhysicsEngine;
-import physics.PhysicsObject;
+import engine.PhysicsBehaviour;
 import physics.Vec2D;
 import physics.shape.AxisAlignedBoundingBox;
 import physics.shape.Circle;
@@ -30,11 +30,11 @@ public class EngineTestUIFrame extends SimpleTestFrame {
         new EngineTestUIFrame();
     }
 
-    private static class EngineTestUIPanel extends JPanel implements KeyListener, MouseMotionListener, ActionListener, CollisionListener {
+    private static class EngineTestUIPanel extends JPanel implements KeyListener, MouseMotionListener, ActionListener {
         private final ArrayList<AxisAlignedBoundingBox> boxes = new ArrayList<>();
         private final ArrayList<Circle> circles = new ArrayList<>();
         private final PhysicsEngine engine = new PhysicsEngine(new Vec2D(800,600));
-        private final PhysicsObject triangle;
+        private final PhysicsBehaviour triangle;
         private Vec2D prevMTV = Vec2D.ZERO;
         public EngineTestUIPanel() {
             super();
@@ -43,7 +43,7 @@ public class EngineTestUIFrame extends SimpleTestFrame {
                 Vec2D bLeft = new Vec2D((float) (Math.random() * 400)+100, (float)Math.random() * 300);
                 Vec2D size = new Vec2D(30,30);
                 AxisAlignedBoundingBox box = new AxisAlignedBoundingBox(bLeft, bLeft.add(size));
-                PhysicsObject object = new PhysicsObject(box, Vec2D.ZERO,true);
+                PhysicsBehaviour object = new PhysicsBehaviour(new GameObject(), engine, box, true);
                 engine.add(object);
                 boxes.add(box);
             }
@@ -51,13 +51,12 @@ public class EngineTestUIFrame extends SimpleTestFrame {
                 // randomly initialize circles
                 Vec2D center = new Vec2D((float) (Math.random() * 400)+100, (float)Math.random() * 300);
                 Circle circle = new Circle(center, 15);
-                PhysicsObject object = new PhysicsObject(circle, Vec2D.ZERO,true);
+                PhysicsBehaviour object = new PhysicsBehaviour(new GameObject(), engine, circle, true);
                 engine.add(object);
                 circles.add(circle);
             }
 
-            triangle = new PhysicsObject(new Triangle(new Vec2D(-10,0), new Vec2D(10,0), new Vec2D(0,20)), new Vec2D(400,400), false);
-            triangle.addCollisionListener(this);
+            triangle = new PhysicsBehaviour(new GameObject(new Vec2D(400,400)), engine, new Triangle(new Vec2D(-10,0), new Vec2D(10,0), new Vec2D(0,20)), false);
             engine.add(triangle);
         }
 
@@ -169,8 +168,7 @@ public class EngineTestUIFrame extends SimpleTestFrame {
             System.out.println("Repaint took " + (end-physicsUpdate)/1000000f + "ms");
         }
 
-        @Override
-        public void onCollision(PhysicsObject listenerTarget, PhysicsObject collider, Vec2D mtv) {
+        public void onCollision(PhysicsBehaviour listenerTarget, PhysicsBehaviour collider, Vec2D mtv) {
             assert listenerTarget == triangle;
             prevMTV = mtv;
         }

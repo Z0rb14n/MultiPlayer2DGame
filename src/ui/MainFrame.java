@@ -15,7 +15,7 @@ class MainFrame extends JFrame {
     }
     private MainFrame() {
         super("don't sue");
-        Timer timer = new Timer(Math.floorDiv(1000,60), ae -> this.update());
+        Timer timer = new Timer(Math.floorDiv(1000,165), ae -> this.update());
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setSize(SIZE);
         setPreferredSize(SIZE);
