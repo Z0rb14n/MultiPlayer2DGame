@@ -34,7 +34,10 @@ public class SceneHierarchyNode {
 
     public void render(java.awt.Graphics2D g) {
         for (GameObject object : objects) {
-            if (object.getBehaviour(RendererBehaviour.class) != null) object.getBehaviour(RendererBehaviour.class).render(g);
+            ArrayList<RendererBehaviour> renderers = object.getBehaviours(RendererBehaviour.class);
+            for (RendererBehaviour renderer : renderers) {
+                renderer.render(g);
+            }
         }
         for (SceneHierarchyNode child : children) {
             child.render(g);

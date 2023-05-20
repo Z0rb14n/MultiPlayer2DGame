@@ -18,44 +18,44 @@ public class SpatialGrid<T> implements BroadphaseStructure<T> {
         this.cellSize = cellSize;
     }
 
-    @Override
-    public void insert(T object, ConvexShape shape) {
+    public ArrayList<Pair<Integer, Integer>> getRelevantCellLocations(ConvexShape shape) {
         AxisAlignedBoundingBox aabb = shape.getAABB();
         int x1 = (int) Math.floor(aabb.getBottomLeft().getX() / cellSize.getX());
         int y1 = (int) Math.floor(aabb.getBottomLeft().getY() / cellSize.getY());
-        int x2 = (int) Math.ceil(aabb.getTopRight().getX() / cellSize.getX());
-        int y2 = (int) Math.ceil(aabb.getTopRight().getY() / cellSize.getY());
+        int x2 = (int) Math.floor(aabb.getTopRight().getX() / cellSize.getX());
+        int y2 = (int) Math.floor(aabb.getTopRight().getY() / cellSize.getY());
+        ArrayList<Pair<Integer, Integer>> cells = new ArrayList<>();
         for(int x = x1; x <= x2; x++) {
             for(int y = y1; y <= y2; y++) {
-                Pair<Integer,Integer> pos = new Pair<>(x, y);
-                if(!cells.containsKey(pos)) {
-                    cells.put(pos, new ArrayList<>());
-                }
-                cells.get(pos).add(object);
+                cells.add(new Pair<>(x, y));
             }
+        }
+        return cells;
+    }
+
+    @Override
+    public void insert(T object, ConvexShape shape) {
+        ArrayList<Pair<Integer, Integer>> locations = getRelevantCellLocations(shape);
+        for (Pair<Integer, Integer> location : locations) {
+            if (!cells.containsKey(location)) {
+                cells.put(location, new ArrayList<>());
+            }
+            cells.get(location).add(object);
         }
     }
 
     @Override
     public void remove(T object, ConvexShape shape) {
-        AxisAlignedBoundingBox aabb = shape.getAABB();
-        int x1 = (int) Math.floor(aabb.getBottomLeft().getX() / cellSize.getX());
-        int y1 = (int) Math.floor(aabb.getBottomLeft().getY() / cellSize.getY());
-        int x2 = (int) Math.ceil(aabb.getTopRight().getX() / cellSize.getX());
-        int y2 = (int) Math.ceil(aabb.getTopRight().getY() / cellSize.getY());
-        for(int x = x1; x <= x2; x++) {
-            for(int y = y1; y <= y2; y++) {
-                Pair<Integer,Integer> pos = new Pair<>(x,y);
-                ArrayList<T> objects = cells.get(pos);
-                if (objects != null) {
-                    objects.remove(object);
-                    if (objects.size() == 0) {
-                        cells.remove(pos);
-                    }
+        ArrayList<Pair<Integer, Integer>> locations = getRelevantCellLocations(shape);
+        for (Pair<Integer, Integer> location : locations) {
+            ArrayList<T> objects = cells.get(location);
+            if (objects != null) {
+                objects.remove(object);
+                if (objects.size() == 0) {
+                    cells.remove(location);
                 }
             }
         }
-
     }
 
     @Override
@@ -66,22 +66,15 @@ public class SpatialGrid<T> implements BroadphaseStructure<T> {
 
     @Override
     public ArrayList<T> findCloseObjects(ConvexShape shape) {
-        AxisAlignedBoundingBox aabb = shape.getAABB();
-        int x1 = (int) Math.floor(aabb.getBottomLeft().getX() / cellSize.getX());
-        int y1 = (int) Math.floor(aabb.getBottomLeft().getY() / cellSize.getY());
-        int x2 = (int) Math.ceil(aabb.getTopRight().getX() / cellSize.getX());
-        int y2 = (int) Math.ceil(aabb.getTopRight().getY() / cellSize.getY());
-        ArrayList<T> result = new ArrayList<>();
+        ArrayList<Pair<Integer, Integer>> locations = getRelevantCellLocations(shape);
         HashSet<T> seen = new HashSet<>();
-        for(int x = x1; x <= x2; x++) {
-            for(int y = y1; y <= y2; y++) {
-                Pair<Integer,Integer> pos = new Pair<>(x,y);
-                if(cells.containsKey(pos)) {
-                    for(T obj : cells.get(pos)) {
-                        if(!seen.contains(obj)) {
-                            seen.add(obj);
-                            result.add(obj);
-                        }
+        ArrayList<T> result = new ArrayList<>();
+        for (Pair<Integer, Integer> location : locations) {
+            if (cells.containsKey(location)) {
+                for (T obj : cells.get(location)) {
+                    if (!seen.contains(obj)) {
+                        seen.add(obj);
+                        result.add(obj);
                     }
                 }
             }

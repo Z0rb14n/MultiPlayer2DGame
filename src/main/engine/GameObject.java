@@ -57,4 +57,14 @@ public class GameObject {
         }
         return null;
     }
+
+    public <T extends GameObjectBehaviour> ArrayList<T> getBehaviours(Class<T> type) {
+        ArrayList<T> list = new ArrayList<>();
+        for (GameObjectBehaviour behaviour : behaviours) {
+            if (type.isInstance(behaviour)) {
+                list.add(type.cast(behaviour));
+            }
+        }
+        return list;
+    }
 }
