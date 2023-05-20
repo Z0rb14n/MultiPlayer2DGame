@@ -48,10 +48,6 @@ public class PhysicsBehaviour implements GameObjectBehaviour {
         engine.remove(this);
     }
 
-    public void removeOOB() {
-        engine.removeImmediateOOB(this);
-    }
-
     public ConvexShape getShape() {
         return shape;
     }

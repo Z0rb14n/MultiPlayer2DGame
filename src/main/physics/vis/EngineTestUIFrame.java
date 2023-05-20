@@ -4,6 +4,7 @@ import engine.GameObject;
 import physics.PhysicsEngine;
 import engine.PhysicsBehaviour;
 import physics.Vec2D;
+import physics.broad.SpatialGrid;
 import physics.shape.AxisAlignedBoundingBox;
 import physics.shape.Circle;
 import physics.shape.Triangle;
@@ -33,7 +34,8 @@ public class EngineTestUIFrame extends SimpleTestFrame {
     private static class EngineTestUIPanel extends JPanel implements KeyListener, MouseMotionListener, ActionListener {
         private final ArrayList<AxisAlignedBoundingBox> boxes = new ArrayList<>();
         private final ArrayList<Circle> circles = new ArrayList<>();
-        private final PhysicsEngine engine = new PhysicsEngine(new Vec2D(800,600));
+        //private final PhysicsEngine engine = new PhysicsEngine(new Vec2D(800,600));
+        private final PhysicsEngine engine = new PhysicsEngine(new SpatialGrid<>(new Vec2D(100,100)));
         private final PhysicsBehaviour triangle;
         private Vec2D prevMTV = Vec2D.ZERO;
         public EngineTestUIPanel() {
@@ -80,13 +82,20 @@ public class EngineTestUIFrame extends SimpleTestFrame {
             graphics.setColor(Color.BLACK);
             Triangle transTriangle = (Triangle) triangle.getTranslatedShape();
             fillTriangle(transTriangle, graphics);
+
+            // render triangle's bounding box
+            AxisAlignedBoundingBox triangleBox = transTriangle.getAABB();
+            graphics.setColor(Color.BLUE);
+            graphics.drawRect((int)triangleBox.getBottomLeft().getX(), (int)triangleBox.getBottomLeft().getY(), (int)triangleBox.getSize().getX(), (int)triangleBox.getSize().getY());
+
+
             graphics.setColor(Color.RED);
             Vec2D vertexOne = transTriangle.getVertices()[0];
             Vec2D vertexTwo = vertexOne.add(prevMTV.mult(10));
             graphics.setStroke(new BasicStroke(3));
             graphics.drawLine((int)vertexOne.getX(), (int)vertexOne.getY(), (int)vertexTwo.getX(), (int)vertexTwo.getY());
 
-            QuadTreeRender.drawTree(graphics, engine.getTree());
+            engine.getBroadphaseStructure().render(graphics, Color.BLACK);
         }
 
         private void fillTriangle(Triangle triangle, Graphics2D graphics) {

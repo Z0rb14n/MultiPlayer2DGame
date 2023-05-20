@@ -1,37 +1,41 @@
 package physics;
 
 import engine.PhysicsBehaviour;
+import physics.broad.BroadphaseStructure;
 import physics.broad.QuadTree;
-import physics.broad.QuadTreeEntry;
-import physics.broad.QuadTreeNode;
+import physics.broad.SpatialGrid;
 import physics.narrow.SATTest;
 import physics.shape.ConvexShape;
 import util.Pair;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class PhysicsEngine {
     public static final Object AWAKE_ATTRIBUTE = "a";
     // super f--ked
     private final ArrayList<PhysicsBehaviour> physicsObjects = new ArrayList<>();
-    private final QuadTree<PhysicsBehaviour> tree;
+    private final BroadphaseStructure<PhysicsBehaviour> broadphaseStructure;
     private final ArrayList<PhysicsBehaviour> removalQueue = new ArrayList<>();
+
+    public PhysicsEngine(BroadphaseStructure<PhysicsBehaviour> structure) {
+        broadphaseStructure = structure;
+    }
 
     public PhysicsEngine(Vec2D dim) {
         this(dim, Vec2D.ZERO);
     }
 
     public PhysicsEngine(Vec2D dim, Vec2D bottomLeft) {
-        tree = new QuadTree<>(dim, bottomLeft, 5, 6);
+
+        this(new QuadTree<>(dim, bottomLeft, 5, 6));
     }
 
-    public QuadTree<PhysicsBehaviour> getTree() {
-        return tree;
+    public BroadphaseStructure<PhysicsBehaviour> getBroadphaseStructure() {
+        return broadphaseStructure;
     }
 
     public void add(PhysicsBehaviour object) {
-        tree.insert(object, object.getTranslatedShape());
+        broadphaseStructure.insert(object, object.getTranslatedShape());
         physicsObjects.add(object);
     }
 
@@ -40,12 +44,7 @@ public class PhysicsEngine {
     }
 
     public void removeImmediate(PhysicsBehaviour object) {
-        tree.remove(object, object.getTranslatedShape());
-        physicsObjects.remove(object);
-    }
-
-    public void removeImmediateOOB(PhysicsBehaviour object) {
-        tree.forceRemove(object);
+        broadphaseStructure.remove(object, object.getTranslatedShape());
         physicsObjects.remove(object);
     }
 
@@ -63,7 +62,7 @@ public class PhysicsEngine {
             }
         }
         for(Pair<PhysicsBehaviour,ConvexShape> object : objectUpdateQueue) {
-            tree.update(object.getFirst(), object.getSecond(), object.getFirst().getTranslatedShape());
+            broadphaseStructure.update(object.getFirst(), object.getSecond(), object.getFirst().getTranslatedShape());
         }
         objectUpdateQueue.clear();
         updateColStep();
@@ -76,7 +75,7 @@ public class PhysicsEngine {
     private void updateColStep() {
         for (PhysicsBehaviour behaviour : physicsObjects) {
             if (behaviour.isStationary() || !behaviour.isAwake()) continue;
-            ArrayList<PhysicsBehaviour> behaviours = tree.findCloseObjects(behaviour.getTranslatedShape());
+            ArrayList<PhysicsBehaviour> behaviours = broadphaseStructure.findCloseObjects(behaviour.getTranslatedShape());
 
             for (PhysicsBehaviour behaviour2 : behaviours) {
                 if (behaviour != behaviour2) {

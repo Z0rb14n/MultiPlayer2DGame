@@ -2,10 +2,11 @@ package game;
 
 import engine.*;
 import physics.*;
+import physics.broad.QuadTree;
+import physics.broad.SpatialGrid;
 import physics.shape.AxisAlignedBoundingBox;
 import physics.shape.Circle;
 import physics.shape.Triangle;
-import physics.vis.QuadTreeRender;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -31,7 +32,8 @@ public class GameController {
     }
 
     private GameController() {
-        engine = new PhysicsEngine(new Vec2D(GAME_WIDTH+100, GAME_HEIGHT+100), new Vec2D(-50,-50));
+        //engine = new PhysicsEngine(new Vec2D(GAME_WIDTH+100, GAME_HEIGHT+100), new Vec2D(-50,-50));
+        engine = new PhysicsEngine(new SpatialGrid<>(new Vec2D(50,50)));
         createBoundingBoxes();
         // create test vehicle
         GameObject v = createVehicle(new Vec2D(100,100));
@@ -90,11 +92,6 @@ public class GameController {
         hierarchy.addObject(go);
     }
 
-    public void forceRemoveBall(GameObject ball) {
-        removeBall(ball);
-        ball.getBehaviour(PhysicsBehaviour.class).removeOOB();
-    }
-
     public void removeBall(GameObject ball) {
         hierarchy.removeObject(ball);
         balls.remove(ball);
@@ -108,7 +105,7 @@ public class GameController {
         Time.deltaTime = (System.nanoTime() - Time.lastRenderNano) / 1000000000f;
         hierarchy.update();
         hierarchy.render(g);
-        QuadTreeRender.drawTree(g, engine.getTree());
+        engine.getBroadphaseStructure().render(g, Color.BLACK);
         Time.lastRenderNano = System.nanoTime();
     }
 

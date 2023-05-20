@@ -4,6 +4,7 @@ import physics.shape.AxisAlignedBoundingBox;
 import physics.shape.ConvexShape;
 import physics.Vec2D;
 
+import java.awt.*;
 import java.util.ArrayList;
 
 // https://research.ncl.ac.uk/game/mastersdegree/gametechnologies/physicstutorials/6accelerationstructures/Physics%20-%20Spatial%20Acceleration%20Structures.pdf
@@ -62,6 +63,27 @@ public class QuadTree<T> implements BroadphaseStructure<T> {
         AxisAlignedBoundingBox postBox = pre.getAABB();
         remove(object, preBox.getBottomLeft(), preBox.getSize());
         insert(object, postBox.getBottomLeft(), postBox.getSize());
+    }
+
+    @Override
+    public void render(Graphics2D g, Color c) {
+        g.setColor(c);
+        g.drawRect((int)root.getBottomLeft().getX(), (int)root.getBottomLeft().getY(), (int)root.getSize().getX(), (int)root.getSize().getY());
+        if (root.getChildren() != null) {
+            for (QuadTreeNode<?> child : root.getChildren()) {
+                render(g, child, c);
+            }
+        }
+    }
+
+    private void render(Graphics2D g, QuadTreeNode<?> tree, Color c) {
+        g.setColor(c);
+        g.drawRect((int)tree.getBottomLeft().getX(), (int)tree.getBottomLeft().getY(), (int)tree.getSize().getX(), (int)tree.getSize().getY());
+        if (tree.getChildren() != null) {
+            for (QuadTreeNode<?> child : tree.getChildren()) {
+                render(g, child, c);
+            }
+        }
     }
 
     public ArrayList<T> findCloseObjects(ConvexShape shape) {
