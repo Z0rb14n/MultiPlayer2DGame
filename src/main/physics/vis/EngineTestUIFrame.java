@@ -22,7 +22,7 @@ public class EngineTestUIFrame extends SimpleTestFrame {
         add(e);
         addKeyListener(e);
         addMouseMotionListener(e);
-        Timer timer = new Timer(1000/60, e);
+        Timer timer = new Timer(1000/165, e);
         timer.start();
         setVisible(true);
     }
