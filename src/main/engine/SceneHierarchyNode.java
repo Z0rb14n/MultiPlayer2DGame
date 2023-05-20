@@ -11,10 +11,8 @@ public class SceneHierarchyNode {
         Collections.addAll(this.objects, objects);
     }
 
-    public SceneHierarchyNode addObject(GameObject object) {
-        SceneHierarchyNode node = new SceneHierarchyNode(object);
-        children.add(node);
-        return node;
+    public void addObject(GameObject object) {
+        objects.add(object);
     }
 
     public void addChild(SceneHierarchyNode node) {

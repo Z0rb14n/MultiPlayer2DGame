@@ -27,6 +27,7 @@ public class GameLogger {
         typeLevels.put("AUDIO", Level.WARNING);
         typeLevels.put("UI", Level.WARNING);
         typeLevels.put("DEBUG", Level.INFO);
+        typeLevels.put("IGNORE", Level.IGNORE);
     }
 
     private Level defaultLevel = Level.INFO;

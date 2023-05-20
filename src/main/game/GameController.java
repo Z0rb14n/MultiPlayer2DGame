@@ -55,7 +55,7 @@ public class GameController {
         GameObject gameObject = new GameObject();
         PhysicsBehaviour behaviour = new PhysicsBehaviour(gameObject,engine,box,true);
         gameObject.addBehaviour(behaviour);
-        BoxRenderer renderer = new BoxRenderer(gameObject, Color.BLACK, true);
+        BoxRenderer renderer = new BoxRenderer(gameObject, Color.BLUE, true);
         gameObject.addBehaviour(renderer);
         return gameObject;
     }
@@ -72,16 +72,6 @@ public class GameController {
 
     }
 
-    public void forceRemoveBall(GameObject ball) {
-        removeBall(ball);
-        ball.getBehaviour(PhysicsBehaviour.class).removeOOB();
-    }
-
-    public void removeBall(GameObject ball) {
-        hierarchy.removeObject(ball);
-        balls.remove(ball);
-    }
-
     public void createBall() {
         Vec2D playerPos = player.getBehaviour(PhysicsBehaviour.class).getPosition();
         Vec2D playerVel = player.getBehaviour(PhysicsBehaviour.class).getVelocity();
@@ -94,10 +84,20 @@ public class GameController {
         go.addBehaviour(behaviour);
         BallBehaviour ballBehaviour = new BallBehaviour(go, hierarchy.getRoot());
         go.addBehaviour(ballBehaviour);
-        CircleRenderer renderer = new CircleRenderer(go, Color.BLUE, false);
+        CircleRenderer renderer = new CircleRenderer(go, Color.MAGENTA, false);
         go.addBehaviour(renderer);
         balls.add(go);
         hierarchy.addObject(go);
+    }
+
+    public void forceRemoveBall(GameObject ball) {
+        removeBall(ball);
+        ball.getBehaviour(PhysicsBehaviour.class).removeOOB();
+    }
+
+    public void removeBall(GameObject ball) {
+        hierarchy.removeObject(ball);
+        balls.remove(ball);
     }
 
     public GameObject getPlayer() {

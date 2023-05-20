@@ -14,10 +14,20 @@ public class BallBehaviour implements GameObjectBehaviour {
         this.go = go;
         this.parent = parent;
     }
+
+    @Override
+    public void physicsUpdate() {
+        Vec2D pos = go.getPosition();
+        //System.out.println(pos);
+        if (pos.getX() < 10 || pos.getX() > GameController.GAME_WIDTH-10 || pos.getY() < 10 || pos.getY() > GameController.GAME_HEIGHT-10) {
+            GameLogger.getDefault().log("BALL OUT OF BOUNDS: " + pos,"IGNORE");
+        }
+    }
+
     @Override
     public void onCollision(PhysicsBehaviour src, PhysicsBehaviour target, Vec2D mtv) {
         counter++;
-        GameLogger.getDefault().log(counter + "BOING","DEBUG");
+        //GameLogger.getDefault().log("BOUNCE COUNT " + counter,"DEBUG");
         if (counter > 10) {
             parent.removeObject(go);
         }

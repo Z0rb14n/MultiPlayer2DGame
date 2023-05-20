@@ -105,12 +105,12 @@ public class QuadTreeNode<T> {
 
     public ArrayList<QuadTreeEntry<T>> findCloseObjects(Vec2D objBleft, Vec2D objSize) {
         ArrayList<QuadTreeEntry<T>> result = new ArrayList<>();
+        if (!getAABB().overlaps(new AxisAlignedBoundingBox(objBleft,objBleft.add(objSize)))) {
+            return result;
+        }
         if (children != null) {
             for (int i = 0; i < 4; i++) {
                 result.addAll(children.get(i).findCloseObjects(objBleft, objSize));
-            }
-            if (contents != null && contents.size() != 0) {
-                System.out.println("???");
             }
         } else {
             for (QuadTreeEntry<T> entry : contents) {

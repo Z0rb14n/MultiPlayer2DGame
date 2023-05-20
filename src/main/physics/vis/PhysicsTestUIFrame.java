@@ -83,7 +83,7 @@ public class PhysicsTestUIFrame extends SimpleTestFrame {
             graphics.setColor(Color.BLACK);
             for (int i = 0; i < rectangles.size(); i++) {
                 AxisAlignedBoundingBox box = rectangles.get(i);
-                ArrayList<QuadTreeEntry<ConvexShape>> closeObjects = tree.findCloseObjects(box);
+                ArrayList<QuadTreeEntry<ConvexShape>> closeObjects = tree.findCloseEntries(box);
                 graphics.setColor(Color.BLACK);
                 for (int j = 0; j < closeObjects.size(); j++) {
                     if (closeObjects.get(j).getObject() == box) continue;
@@ -95,7 +95,7 @@ public class PhysicsTestUIFrame extends SimpleTestFrame {
                 graphics.fillRect((int)box.getBottomLeft().getX(), (int)box.getBottomLeft().getY(), (int)box.getSize().getX(), (int)box.getSize().getY());
             }
 
-            ArrayList<QuadTreeEntry<ConvexShape>> closeObjects = tree.findCloseObjects(triangleOne);
+            ArrayList<QuadTreeEntry<ConvexShape>> closeObjects = tree.findCloseEntries(triangleOne);
             graphics.setColor(Color.BLACK);
             for (int j = 0; j < closeObjects.size(); j++) {
                 if (closeObjects.get(j).getObject() == triangleOne) continue;

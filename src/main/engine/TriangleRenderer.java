@@ -1,8 +1,5 @@
 package engine;
 
-import engine.GameObject;
-import engine.PhysicsBehaviour;
-import engine.RendererBehaviour;
 import physics.Vec2D;
 
 import java.awt.*;

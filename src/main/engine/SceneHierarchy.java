@@ -1,7 +1,5 @@
 package engine;
 
-import java.util.ArrayList;
-
 // we love stepping on unity's toes
 public class SceneHierarchy {
     private final SceneHierarchyNode root = new SceneHierarchyNode();

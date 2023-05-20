@@ -7,7 +7,7 @@ import physics.Vec2D;
 import java.util.ArrayList;
 
 // https://research.ncl.ac.uk/game/mastersdegree/gametechnologies/physicstutorials/6accelerationstructures/Physics%20-%20Spatial%20Acceleration%20Structures.pdf
-public class QuadTree<T> {
+public class QuadTree<T> implements BroadphaseStructure<T> {
     private final QuadTreeNode<T> root;
     private final Vec2D bLeft;
     private final int maxDepth;
@@ -64,12 +64,26 @@ public class QuadTree<T> {
         insert(object, postBox.getBottomLeft(), postBox.getSize());
     }
 
-    public ArrayList<QuadTreeEntry<T>> findCloseObjects(ConvexShape shape) {
+    public ArrayList<T> findCloseObjects(ConvexShape shape) {
         AxisAlignedBoundingBox box = shape.getAABB();
         return findCloseObjects(box.getBottomLeft(), box.getSize());
     }
 
-    public ArrayList<QuadTreeEntry<T>> findCloseObjects(Vec2D objBleft, Vec2D objSize) {
+    public ArrayList<T> findCloseObjects(Vec2D objBleft, Vec2D objSize) {
+        ArrayList<QuadTreeEntry<T>> entries = root.findCloseObjects(objBleft, objSize);
+        ArrayList<T> objects = new ArrayList<>();
+        for (QuadTreeEntry<T> entry : entries) {
+            objects.add(entry.getObject());
+        }
+        return objects;
+    }
+
+    public ArrayList<QuadTreeEntry<T>> findCloseEntries(ConvexShape shape) {
+        AxisAlignedBoundingBox box = shape.getAABB();
+        return findCloseEntries(box.getBottomLeft(), box.getSize());
+    }
+
+    public ArrayList<QuadTreeEntry<T>> findCloseEntries(Vec2D objBleft, Vec2D objSize) {
         return root.findCloseObjects(objBleft, objSize);
     }
 }
