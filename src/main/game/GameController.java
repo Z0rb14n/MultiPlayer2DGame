@@ -4,7 +4,6 @@ import engine.*;
 import physics.*;
 import physics.broad.SpatialGrid;
 import physics.shape.AxisAlignedBoundingBox;
-import physics.shape.Circle;
 import physics.shape.Triangle;
 
 import java.awt.*;
@@ -15,12 +14,11 @@ import java.util.ArrayList;
  */
 public class GameController {
     public static int VEHICLE_COLLISION_MASK = 0b10;
-    public static int BALL_COLLISION_MASK = 0b01;
     public static final int GAME_WIDTH = 800;
     public static final int GAME_HEIGHT = 400;
     private final PhysicsEngine engine;
     private final ArrayList<GameObject> vehicles = new ArrayList<>();
-    private final ArrayList<GameObject> balls = new ArrayList<>();
+    private final ArrayList<BallObject> balls = new ArrayList<>();
     private final SceneHierarchy hierarchy = new SceneHierarchy();
     private final GameObject player;
     private static int GAME_SPEED = 3;
@@ -77,23 +75,9 @@ public class GameController {
         Vec2D playerPos = player.getBehaviour(PhysicsBehaviour.class).getPosition();
         Vec2D playerVel = player.getBehaviour(PhysicsBehaviour.class).getVelocity();
         Vec2D ballPos = playerPos.add(playerVel.normalize().scaleTo(10));
-        Circle circle = new Circle(Vec2D.ZERO,2);
-        GameObject go = new GameObject(ballPos);
-        PhysicsBehaviour behaviour = new PhysicsBehaviour(go, engine, circle, false);
-        behaviour.setCollisionMask(BALL_COLLISION_MASK);
-        behaviour.setVelocity(new Vec2D(100,100));
-        go.addBehaviour(behaviour);
-        BallBehaviour ballBehaviour = new BallBehaviour(go, hierarchy.getRoot());
-        go.addBehaviour(ballBehaviour);
-        CircleRenderer renderer = new CircleRenderer(go, Color.MAGENTA, false);
-        go.addBehaviour(renderer);
-        balls.add(go);
-        hierarchy.addObject(go);
-    }
-
-    public void removeBall(GameObject ball) {
-        hierarchy.removeObject(ball);
-        balls.remove(ball);
+        BallObject bo = new BallObject(engine, hierarchy.getRoot(), ballPos, new Vec2D(100,100));
+        balls.add(bo);
+        hierarchy.addObject(bo);
     }
 
     public GameObject getPlayer() {
