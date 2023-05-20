@@ -1,6 +1,5 @@
 package engine;
 
-import game.GameLogger;
 import physics.PhysicsEngine;
 import physics.Vec2D;
 import physics.shape.ConvexShape;

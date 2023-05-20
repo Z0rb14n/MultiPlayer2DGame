@@ -6,10 +6,6 @@ public class Pair<FirstClass, SecondClass> {
     private FirstClass a;
     private SecondClass b;
 
-    public Pair() {
-        this(null, null);
-    }
-
     public Pair(FirstClass a, SecondClass b) {
         set(a, b);
     }
@@ -30,7 +26,7 @@ public class Pair<FirstClass, SecondClass> {
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof Pair)) return false;
-        Pair p = (Pair) o;
+        Pair<?,?> p = (Pair<?,?>) o;
         return a.equals(p.a) && b.equals(p.b);
     }
 

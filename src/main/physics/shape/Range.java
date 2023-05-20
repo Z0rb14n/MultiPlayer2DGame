@@ -1,8 +1,8 @@
 package physics.shape;
 
 public class Range {
-    private float lower;
-    private float upper;
+    private final float lower;
+    private final float upper;
 
     public Range(float lower, float upper) {
         this.lower = lower;
@@ -15,14 +15,6 @@ public class Range {
 
     public float getUpper() {
         return upper;
-    }
-
-    public void setLower(float lower) {
-        this.lower = lower;
-    }
-
-    public void setUpper(float upper) {
-        this.upper = upper;
     }
 
     public boolean contains(float value) {

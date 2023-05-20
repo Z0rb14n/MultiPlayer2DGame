@@ -90,6 +90,7 @@ public class EngineTestUIFrame extends SimpleTestFrame {
 
 
             graphics.setColor(Color.RED);
+            // TODO SAVE MTV AFTER COLLISION
             Vec2D vertexOne = transTriangle.getVertices()[0];
             Vec2D vertexTwo = vertexOne.add(prevMTV.mult(10));
             graphics.setStroke(new BasicStroke(3));
@@ -175,11 +176,6 @@ public class EngineTestUIFrame extends SimpleTestFrame {
             repaint();
             long end = System.nanoTime();
             System.out.println("Repaint took " + (end-physicsUpdate)/1000000f + "ms");
-        }
-
-        public void onCollision(PhysicsBehaviour listenerTarget, PhysicsBehaviour collider, Vec2D mtv) {
-            assert listenerTarget == triangle;
-            prevMTV = mtv;
         }
     }
 }

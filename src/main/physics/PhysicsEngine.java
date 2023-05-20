@@ -3,7 +3,6 @@ package physics;
 import engine.PhysicsBehaviour;
 import physics.broad.BroadphaseStructure;
 import physics.broad.QuadTree;
-import physics.broad.SpatialGrid;
 import physics.narrow.SATTest;
 import physics.shape.ConvexShape;
 import util.Pair;

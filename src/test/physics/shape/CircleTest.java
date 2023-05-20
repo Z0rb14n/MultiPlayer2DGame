@@ -48,6 +48,7 @@ public class CircleTest {
 
         Circle circle = new Circle(new Vec2D(20,20), 10);
         Vec2D mtv = SATTest.getMTV(circle, top);
+        assertNotNull(mtv);
         assertVectorEquals(new Vec2D(0, 10), mtv, 0.0001);
         assertVectorEquals(mtv.mult(-1), SATTest.getMTV(top, circle), 0.0001);
     }

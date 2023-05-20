@@ -45,10 +45,6 @@ public class QuadTree<T> implements BroadphaseStructure<T> {
         root.insert(object, objBleft, objSize, maxDepth, maxSize);
     }
 
-    public void forceRemove(T object) {
-        root.forceRemove(object);
-    }
-
     public void remove(T object, ConvexShape shape) {
         AxisAlignedBoundingBox box = shape.getAABB();
         remove(object, box.getBottomLeft(), box.getSize());

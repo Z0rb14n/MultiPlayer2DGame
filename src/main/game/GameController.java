@@ -2,7 +2,6 @@ package game;
 
 import engine.*;
 import physics.*;
-import physics.broad.QuadTree;
 import physics.broad.SpatialGrid;
 import physics.shape.AxisAlignedBoundingBox;
 import physics.shape.Circle;

@@ -19,14 +19,6 @@ public class AxisAlignedBoundingBox extends ConvexShape {
         return topRight;
     }
 
-    public void setBottomLeft(Vec2D bottomLeft) {
-        this.bottomLeft = bottomLeft;
-    }
-
-    public void setTopRight(Vec2D topRight) {
-        this.topRight = topRight;
-    }
-
     public float getWidth() {
         return topRight.getX() - bottomLeft.getX();
     }

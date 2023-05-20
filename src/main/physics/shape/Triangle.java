@@ -7,10 +7,6 @@ public class Triangle extends ConvexShape {
     private Vec2D vertex2;
     private Vec2D vertex3;
 
-    public Triangle(Vec2D[] vertices) {
-        this(vertices[0], vertices[1], vertices[2]);
-    }
-
     public Triangle(Vec2D vertex1, Vec2D vertex2, Vec2D vertex3) {
         this.vertex1 = vertex1;
         this.vertex2 = vertex2;

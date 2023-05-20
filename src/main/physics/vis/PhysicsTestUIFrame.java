@@ -32,10 +32,10 @@ public class PhysicsTestUIFrame extends SimpleTestFrame {
     }
 
     private static class PhysicsTestUIPanel extends JPanel implements KeyListener, MouseMotionListener {
-        private QuadTree<ConvexShape> tree;
+        private final QuadTree<ConvexShape> tree;
 
-        private ArrayList<AxisAlignedBoundingBox> rectangles = new ArrayList<>();
-        private Triangle triangleOne;
+        private final ArrayList<AxisAlignedBoundingBox> rectangles = new ArrayList<>();
+        private final Triangle triangleOne;
         public PhysicsTestUIPanel() {
             super();
             tree = new QuadTree<>(new Vec2D(800, 600), 5, 6);
