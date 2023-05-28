@@ -3,7 +3,7 @@ package net;
 /**
  * Receiver for Server/Client events
  */
-public interface EventReceiver {
+public interface NetworkEventReceiver {
     /**
      * Runs when a client connects to the server (called by ModifiedServer)
      * @param s

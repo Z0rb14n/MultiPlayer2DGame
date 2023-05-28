@@ -6,13 +6,15 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.net.SocketException;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 
 /**
  * Processing's Client class but modified to not use PApplet
  */
 public class ModifiedClient implements Runnable {
     private static final int MAX_BUFFER_SIZE = 1 << 27; // 128 MB
-    private EventReceiver eventReceiver;
+    private final ArrayList<NetworkEventReceiver> networkEventReceivers = new ArrayList<>(1);
     private volatile Thread thread;
     private Socket socket;
     private InputStream input;
@@ -24,32 +26,20 @@ public class ModifiedClient implements Runnable {
 
 
     /**
-     * @param parent typically use "this"
-     * @param host   address of the server
-     * @param port   port to read/write from on the server
+     * @param host address of the server
+     * @param port port to read/write from on the server
+     *
+     * @throws IOException
      */
-    public ModifiedClient(EventReceiver parent, String host, int port) {
-        this.eventReceiver = parent;
-
-        try {
-            socket = new Socket(host, port);
-            input = socket.getInputStream();
-            output = socket.getOutputStream();
-
-            thread = new Thread(this);
-            thread.start();
-        } catch (IOException e) {
-            e.printStackTrace();
-            dispose();
-        }
+    public ModifiedClient(String host, int port) throws IOException {
+        this(new Socket(host, port));
     }
 
     /**
      * @param socket any object of type Socket
      * @throws IOException
      */
-    public ModifiedClient(EventReceiver parent, Socket socket) throws IOException {
-        this.eventReceiver = parent;
+    public ModifiedClient(Socket socket) throws IOException {
         this.socket = socket;
 
         input = socket.getInputStream();
@@ -59,13 +49,26 @@ public class ModifiedClient implements Runnable {
         thread.start();
     }
 
+    public void addNetworkEventReceiver(NetworkEventReceiver networkEventReceiver) {
+        networkEventReceivers.add(networkEventReceiver);
+    }
+
+    public void removeNetworkEventReceiver(NetworkEventReceiver networkEventReceiver) {
+        networkEventReceivers.remove(networkEventReceiver);
+    }
+
+    public void clearNetworkEventReceivers() {
+        networkEventReceivers.clear();
+    }
+
     /**
      * Disconnects from the server. Use to shut the connection when you're
      * finished with the Client.
      */
     public void stop() {
         if (thread != null) {
-            eventReceiver.disconnectEvent(this);
+            for (NetworkEventReceiver networkEventReceiver : networkEventReceivers)
+                networkEventReceiver.disconnectEvent(this);
         }
         dispose();
     }
@@ -79,6 +82,7 @@ public class ModifiedClient implements Runnable {
      */
     public void dispose() {
         thread = null;
+        networkEventReceivers.clear();
         try {
             if (input != null) {
                 input.close();
@@ -139,7 +143,8 @@ public class ModifiedClient implements Runnable {
                     // read returns -1 if end-of-stream occurs (for example if the host disappears)
                     if (readCount == -1) {
                         System.err.println("Client got end-of-stream.");
-                        eventReceiver.endOfStreamEvent(this);
+                        for (NetworkEventReceiver networkEventReceiver : networkEventReceivers)
+                            networkEventReceiver.endOfStreamEvent(this);
                         stop();
                         return;
                     }
@@ -175,7 +180,8 @@ public class ModifiedClient implements Runnable {
                     }
 
                     // now post an event
-                    eventReceiver.dataReceivedEvent(this);
+                    for (NetworkEventReceiver networkEventReceiver : networkEventReceivers)
+                        networkEventReceiver.dataReceivedEvent(this);
                 }
             } catch (IOException e) {
                 //errorMessage("run", e);
@@ -232,28 +238,16 @@ public class ModifiedClient implements Runnable {
      * the buffer. Returns -1 if there is no byte, although this should be
      * avoided by first checking available() to see if any data is available.
      */
-    public int read() {
+    public byte read() {
         synchronized (bufferLock) {
             if (bufferIndex == bufferLast) return -1;
 
-            int outgoing = buffer[bufferIndex++] & 0xff;
+            byte outgoing = (byte) (buffer[bufferIndex++] & 0xff);
             if (bufferIndex == bufferLast) {  // rewind
                 bufferIndex = 0;
                 bufferLast = 0;
             }
             return outgoing;
-        }
-    }
-
-
-    /**
-     * Returns the next byte in the buffer as a char. Returns -1 or 0xffff if
-     * nothing is there.
-     */
-    public char readChar() {
-        synchronized (bufferLock) {
-            if (bufferIndex == bufferLast) return (char) (-1);
-            return (char) read();
         }
     }
 
@@ -436,16 +430,12 @@ public class ModifiedClient implements Runnable {
 
 
     /**
-     * Returns the all the data from the buffer as a String. This method
-     * assumes the incoming characters are ASCII. If you want to transfer
-     * Unicode data, first convert the String to a byte stream in the
-     * representation of your choice (i.e. UTF8 or two-byte Unicode data), and
-     * send it as a byte array.
+     * Returns the all the data from the buffer as a UTF8 String.
      */
     public String readString() {
         byte[] b = readBytes();
         if (b == null) return null;
-        return new String(b);
+        return StandardCharsets.UTF_8.decode(ByteBuffer.wrap(b)).toString();
     }
 
 
@@ -453,16 +443,12 @@ public class ModifiedClient implements Runnable {
      * Combination of <b>readBytesUntil()</b> and <b>readString()</b>. Returns
      * <b>null</b> if it doesn't find what you're looking for.
      *
-     * If you want to move Unicode data, you can first convert the
-     * String to a byte stream in the representation of your choice
-     * (i.e. UTF8 or two-byte Unicode data), and send it as a byte array.
-     *
      * @param interesting character designated to mark the end of the data
      */
     public String readStringUntil(int interesting) {
         byte[] b = readBytesUntil(interesting);
         if (b == null) return null;
-        return new String(b);
+        return StandardCharsets.UTF_8.decode(ByteBuffer.wrap(b)).toString();
     }
 
 
@@ -471,7 +457,7 @@ public class ModifiedClient implements Runnable {
      *
      * @param data data to write
      */
-    public void write(int data) {  // will also cover char
+    public void writeByte(byte data) {
         try {
             output.write(data & 0xff);  // for good measure do the &
             output.flush();   // hmm, not sure if a good idea
@@ -481,16 +467,40 @@ public class ModifiedClient implements Runnable {
         }
     }
 
-    public void writeInt32(int int32) {
-        write(ByteBuffer.allocate(4).putInt(int32).array());
+    public void writeShort(short int16) {
+        writeBytes(ByteBuffer.allocate(2).putShort(int16).array());
     }
 
-    public int readInt32() {
+    public short readShort() {
+        return ByteBuffer.wrap(readBytes(2)).getShort();
+    }
+
+    public void writeInt(int int32) {
+        writeBytes(ByteBuffer.allocate(4).putInt(int32).array());
+    }
+
+    public int readInt() {
         return ByteBuffer.wrap(readBytes(4)).getInt();
     }
 
+    public void writeLong(long int64) {
+        writeBytes(ByteBuffer.allocate(8).putLong(int64).array());
+    }
 
-    public void write(byte[] data) {
+    public long readLong() {
+        return ByteBuffer.wrap(readBytes(8)).getLong();
+    }
+
+    public void writeFloat(float float32) {
+        writeBytes(ByteBuffer.allocate(4).putFloat(float32).array());
+    }
+
+    public float readFloat() {
+        return ByteBuffer.wrap(readBytes(4)).getFloat();
+    }
+
+
+    public void writeBytes(byte[] data) {
         try {
             output.write(data);
             output.flush();   // hmm, not sure if a good idea
@@ -500,20 +510,7 @@ public class ModifiedClient implements Runnable {
         }
     }
 
-
-    /**
-     * Write a String to the output. Note that this doesn't account
-     * for Unicode (two bytes per char), nor will it send UTF8
-     * characters.. It assumes that you mean to send a byte buffer
-     * (most often the case for networking and serial i/o) and
-     * will only use the bottom 8 bits of each char in the string.
-     * (Meaning that internally it uses String.getBytes)
-     *
-     * If you want to move Unicode data, you can first convert the
-     * String to a byte stream in the representation of your choice
-     * (i.e. UTF8 or two-byte Unicode data), and send it as a byte array.
-     */
-    public void write(String data) {
-        write(data.getBytes());
+    public void writeStr(String data) {
+        writeBytes(data.getBytes(StandardCharsets.UTF_8));
     }
 }

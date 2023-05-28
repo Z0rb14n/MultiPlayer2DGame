@@ -1,10 +1,17 @@
 package net;
 
-public class TronServer implements EventReceiver {
+import java.io.IOException;
+
+public class TronServer implements NetworkEventReceiver {
     private ModifiedClient[] clients = new ModifiedClient[2]; // player 1, player 2
     private ModifiedServer server;
     public TronServer() {
-        server = new ModifiedServer(this,NetworkConstants.PORT);
+        try {
+            server = new ModifiedServer(NetworkConstants.PORT);
+            server.addNetworkEventReceiver(this);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

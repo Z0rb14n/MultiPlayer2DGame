@@ -8,26 +8,31 @@ import java.util.ArrayList;
  * Processing's Server class modified to not use PApplet
  */
 public class ModifiedServer implements Runnable {
-    private EventReceiver eventReceiver;
+    private final ArrayList<NetworkEventReceiver> networkEventReceivers = new ArrayList<>(1);
     private volatile Thread thread;
     private ServerSocket server;
     private final Object clientsLock = new Object[0];
     private ArrayList<ModifiedClient> clients = new ArrayList<>(10);
 
     /**
-     * @param parent typically use "this"
-     * @param port   port used to transfer data
+     * @param port port used to transfer data
      */
-    public ModifiedServer(EventReceiver parent, int port) {
-        this.eventReceiver = parent;
-        try {
-            server = new ServerSocket(port);
-            thread = new Thread(this);
-            thread.start();
-        } catch (IOException e) {
-            thread = null;
-            throw new RuntimeException(e);
-        }
+    public ModifiedServer(int port) throws IOException {
+        server = new ServerSocket(port);
+        thread = new Thread(this);
+        thread.start();
+    }
+
+    public void addNetworkEventReceiver(NetworkEventReceiver networkEventReceiver) {
+        networkEventReceivers.add(networkEventReceiver);
+    }
+
+    public void removeNetworkEventReceiver(NetworkEventReceiver networkEventReceiver) {
+        networkEventReceivers.remove(networkEventReceiver);
+    }
+
+    public void clearNetworkEventReceivers() {
+        networkEventReceivers.clear();
     }
 
 
@@ -172,10 +177,13 @@ public class ModifiedServer implements Runnable {
         while (Thread.currentThread() == thread) {
             try {
                 Socket socket = server.accept();
-                ModifiedClient client = new ModifiedClient(eventReceiver, socket);
+                ModifiedClient client = new ModifiedClient(socket);
+                for(NetworkEventReceiver networkEventReceiver : networkEventReceivers)
+                    client.addNetworkEventReceiver(networkEventReceiver);
                 synchronized (clientsLock) {
                     addClient(client);
-                    eventReceiver.clientConnectionEvent(this, client);
+                    for(NetworkEventReceiver networkEventReceiver : networkEventReceivers)
+                        networkEventReceiver.clientConnectionEvent(this, client);
                 }
             } catch (SocketException e) {
                 //thrown when server.close() is called and server is waiting on accept
@@ -196,12 +204,12 @@ public class ModifiedServer implements Runnable {
      *
      * @param data data to write
      */
-    public void write(int data) {  // will also cover char
+    public void writeByte(byte data) {
         synchronized (clientsLock) {
             int index = 0;
             while (index < clients.size()) {
                 if (clients.get(index).active()) {
-                    clients.get(index).write(data);
+                    clients.get(index).writeByte(data);
                     index++;
                 } else {
                     removeIndex(index);
@@ -210,12 +218,12 @@ public class ModifiedServer implements Runnable {
         }
     }
 
-    public void write(byte[] data) {
+    public void writeBytes(byte[] data) {
         synchronized (clientsLock) {
             int index = 0;
             while (index < clients.size()) {
                 if (clients.get(index).active()) {
-                    clients.get(index).write(data);
+                    clients.get(index).writeBytes(data);
                     index++;
                 } else {
                     removeIndex(index);
@@ -224,12 +232,68 @@ public class ModifiedServer implements Runnable {
         }
     }
 
-    public void write(String data) {
+    public void writeShort(short data) {
         synchronized (clientsLock) {
             int index = 0;
             while (index < clients.size()) {
                 if (clients.get(index).active()) {
-                    clients.get(index).write(data);
+                    clients.get(index).writeShort(data);
+                    index++;
+                } else {
+                    removeIndex(index);
+                }
+            }
+        }
+    }
+
+    public void writeInt(int data) {
+        synchronized (clientsLock) {
+            int index = 0;
+            while (index < clients.size()) {
+                if (clients.get(index).active()) {
+                    clients.get(index).writeInt(data);
+                    index++;
+                } else {
+                    removeIndex(index);
+                }
+            }
+        }
+    }
+
+    public void writeLong(long data) {
+        synchronized (clientsLock) {
+            int index = 0;
+            while (index < clients.size()) {
+                if (clients.get(index).active()) {
+                    clients.get(index).writeLong(data);
+                    index++;
+                } else {
+                    removeIndex(index);
+                }
+            }
+        }
+    }
+
+    public void writeFloat(float data) {
+        synchronized (clientsLock) {
+            int index = 0;
+            while (index < clients.size()) {
+                if (clients.get(index).active()) {
+                    clients.get(index).writeFloat(data);
+                    index++;
+                } else {
+                    removeIndex(index);
+                }
+            }
+        }
+    }
+
+    public void writeStr(String data) {
+        synchronized (clientsLock) {
+            int index = 0;
+            while (index < clients.size()) {
+                if (clients.get(index).active()) {
+                    clients.get(index).writeStr(data);
                     index++;
                 } else {
                     removeIndex(index);
