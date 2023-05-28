@@ -233,7 +233,7 @@ public class BasicClient implements Runnable {
     /**
      * Returns a number between 0 and 255 for the next byte that's waiting in
      * the buffer. Returns -1 if there is no byte, although this should be
-     * avoided by first checking available() to see if any data is available.
+     * avoided by first checking {@link BasicClient#available()} to see if any data is available.
      */
     public byte read() {
         synchronized (bufferLock) {
@@ -261,7 +261,7 @@ public class BasicClient implements Runnable {
      * Return a byte array of anything that's in the serial buffer.
      * Not particularly memory/speed efficient, because it creates
      * a byte array on each read, but it's easier to use than
-     * readBytes(byte b[]) (see below).
+     * {@link net.BasicClient#readBytes(byte[])}.
      */
     public byte[] readBytes() {
         synchronized (bufferLock) {
@@ -283,7 +283,7 @@ public class BasicClient implements Runnable {
      * up to the specified maximum number of bytes.
      * Not particularly memory/speed efficient, because it creates
      * a byte array on each read, but it's easier to use than
-     * readBytes(byte b[]) (see below).
+     * {@link net.BasicClient#readBytes(byte[])}.
      *
      * @param max the maximum number of bytes to read
      */
@@ -383,7 +383,7 @@ public class BasicClient implements Runnable {
      * Reads from the serial port into a buffer of bytes until a
      * particular character. If the character isn't in the serial
      * buffer, then 'null' is returned.
-     *
+     * <p></p>
      * If outgoing[] is not big enough, then -1 is returned,
      * and an error message is printed on the console.
      * If nothing is in the buffer, zero is returned.
@@ -413,7 +413,6 @@ public class BasicClient implements Runnable {
                         " bytes up to and including char " + interesting);
                 return -1;
             }
-            //byte outgoing[] = new byte[length];
             System.arraycopy(buffer, bufferIndex, byteBuffer, 0, length);
 
             bufferIndex += length;
@@ -437,7 +436,7 @@ public class BasicClient implements Runnable {
 
 
     /**
-     * Combination of <b>readBytesUntil()</b> and <b>readString()</b>. Returns
+     * Combination of {@link net.BasicClient#readBytesUntil(int, byte[])} and {@link BasicClient#readString()}. Returns
      * <b>null</b> if it doesn't find what you're looking for.
      *
      * @param interesting character designated to mark the end of the data

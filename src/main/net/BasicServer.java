@@ -110,6 +110,8 @@ public class BasicServer implements Runnable {
 
     /**
      * Returns the next client in line with a new message.
+     * <p>
+     * Client may be dead - check for active.
      */
     public BasicClient available() {
         synchronized (clientsLock) {
@@ -127,7 +129,7 @@ public class BasicServer implements Runnable {
                     //doesn't end up skipping the next client
                     which--;
                     //fall through to allow data from dead clients
-                    //to be retreived.
+                    //to be retrieved.
                 }
                 if (client.available() > 0) {
                     lastAvailable = which;
@@ -138,23 +140,10 @@ public class BasicServer implements Runnable {
         return null;
     }
 
-
     /**
-     * Disconnects all clients and stops the server.
-     *
-     * Use this to shut down the server if you finish using it while your applet
-     * is still running. Otherwise, it will be automatically be shut down by the
-     * host PApplet using dispose(), which is identical.
+     * Disconnect all clients and stop the server.
      */
-    public void stop() {
-        dispose();
-    }
-
-
-    /**
-     * Disconnect all clients and stop the server: internal use only.
-     */
-    private void dispose() {
+    public void dispose() {
         thread = null;
 
         if (clients != null) {

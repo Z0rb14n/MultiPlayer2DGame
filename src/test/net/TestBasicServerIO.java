@@ -123,6 +123,6 @@ public class TestBasicServerIO {
     @AfterAll
     public static void teardown() {
         client.stop();
-        server.stop();
+        server.dispose();
     }
 }
