@@ -59,7 +59,7 @@ public class BasicClient implements Runnable {
     }
 
     /**
-     * Disconnects from the server. Use to shut the connection when you're
+     * Disconnects from the server and informs listeners. Use to shut the connection when you're
      * finished with the Client.
      */
     public void stop() {
@@ -72,10 +72,9 @@ public class BasicClient implements Runnable {
 
 
     /**
-     * Disconnect from the server: internal use only.
-     *
-     * This should only be called by the internal functions in PApplet,
-     * use stop() instead from within your own applets.
+     * Disconnect from the server and frees resources without informing listeners.
+     * <p></p>
+     * Generally use {@link BasicClient#stop()} instead.
      */
     public void dispose() {
         thread = null;
