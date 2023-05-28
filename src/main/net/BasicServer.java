@@ -7,17 +7,17 @@ import java.util.ArrayList;
 /**
  * Processing's Server class modified to not use PApplet
  */
-public class ModifiedServer implements Runnable {
+public class BasicServer implements Runnable {
     private final ArrayList<NetworkEventReceiver> networkEventReceivers = new ArrayList<>(1);
     private volatile Thread thread;
     private ServerSocket server;
     private final Object clientsLock = new Object[0];
-    private ArrayList<ModifiedClient> clients = new ArrayList<>(10);
+    private ArrayList<BasicClient> clients = new ArrayList<>(10);
 
     /**
      * @param port port used to transfer data
      */
-    public ModifiedServer(int port) throws IOException {
+    public BasicServer(int port) throws IOException {
         server = new ServerSocket(port);
         thread = new Thread(this);
         thread.start();
@@ -40,7 +40,7 @@ public class ModifiedServer implements Runnable {
      * Disconnect a particular client
      * @param client the client to disconnect
      */
-    public void disconnect(ModifiedClient client) {
+    public void disconnect(BasicClient client) {
         client.stop();
         synchronized (clientsLock) {
             int index = clientIndex(client);
@@ -69,14 +69,14 @@ public class ModifiedServer implements Runnable {
     }
 
 
-    private void addClient(ModifiedClient client) {
+    private void addClient(BasicClient client) {
         synchronized (clientsLock) {
             clients.add(client);
         }
     }
 
 
-    private int clientIndex(ModifiedClient client) {
+    private int clientIndex(BasicClient client) {
         synchronized (clientsLock) {
             for (int i = 0; i < clients.size(); i++) {
                 if (clients.get(i) == client) return i;
@@ -111,14 +111,14 @@ public class ModifiedServer implements Runnable {
     /**
      * Returns the next client in line with a new message.
      */
-    public ModifiedClient available() {
+    public BasicClient available() {
         synchronized (clientsLock) {
             int index = lastAvailable + 1;
             if (index >= clients.size()) index = 0;
 
             for (int i = 0; i < clients.size(); i++) {
                 int which = (index + i) % clients.size();
-                ModifiedClient client = clients.get(which);
+                BasicClient client = clients.get(which);
                 //Check for valid client
                 if (!client.active()) {
                     removeIndex(which);  //Remove dead client
@@ -177,7 +177,7 @@ public class ModifiedServer implements Runnable {
         while (Thread.currentThread() == thread) {
             try {
                 Socket socket = server.accept();
-                ModifiedClient client = new ModifiedClient(socket);
+                BasicClient client = new BasicClient(socket);
                 for(NetworkEventReceiver networkEventReceiver : networkEventReceivers)
                     client.addNetworkEventReceiver(networkEventReceiver);
                 synchronized (clientsLock) {

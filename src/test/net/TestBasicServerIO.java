@@ -12,13 +12,13 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class TestBasicServerIO {
     private static final int PORT = 5204;
-    private static ModifiedServer server;
-    private static ModifiedClient client;
+    private static BasicServer server;
+    private static BasicClient client;
 
     @BeforeAll
     public static void setup() throws IOException {
-        server = new ModifiedServer(PORT);
-        client = new ModifiedClient("localhost", PORT);
+        server = new BasicServer(PORT);
+        client = new BasicClient("localhost", PORT);
         assertTrue(server.active());
         assertTrue(client.active());
     }

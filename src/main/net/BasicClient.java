@@ -12,7 +12,7 @@ import java.util.ArrayList;
 /**
  * Processing's Client class but modified to not use PApplet
  */
-public class ModifiedClient implements Runnable {
+public class BasicClient implements Runnable {
     private static final int MAX_BUFFER_SIZE = 1 << 27; // 128 MB
     private final ArrayList<NetworkEventReceiver> networkEventReceivers = new ArrayList<>(1);
     private volatile Thread thread;
@@ -28,18 +28,15 @@ public class ModifiedClient implements Runnable {
     /**
      * @param host address of the server
      * @param port port to read/write from on the server
-     *
-     * @throws IOException
      */
-    public ModifiedClient(String host, int port) throws IOException {
+    public BasicClient(String host, int port) throws IOException {
         this(new Socket(host, port));
     }
 
     /**
      * @param socket any object of type Socket
-     * @throws IOException
      */
-    public ModifiedClient(Socket socket) throws IOException {
+    public BasicClient(Socket socket) throws IOException {
         this.socket = socket;
 
         input = socket.getInputStream();
@@ -260,7 +257,7 @@ public class ModifiedClient implements Runnable {
      * it into the byte array passed in and returns an int value for the number
      * of bytes read. If more bytes are available than can fit into the
      * byteBuffer, only those that fit are read.
-     *
+     * <p></p>
      * Return a byte array of anything that's in the serial buffer.
      * Not particularly memory/speed efficient, because it creates
      * a byte array on each read, but it's easier to use than
@@ -314,7 +311,7 @@ public class ModifiedClient implements Runnable {
      * Grab whatever is in the serial buffer, and stuff it into a
      * byte buffer passed in by the user. This is more memory/time
      * efficient than readBytes() returning a byte[] array.
-     *
+     * <p></p>
      * Returns an int for how many bytes were read. If more bytes
      * are available than can fit into the byte array, only those
      * that will fit are read.
