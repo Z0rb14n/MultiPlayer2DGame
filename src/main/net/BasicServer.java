@@ -290,4 +290,18 @@ public class BasicServer implements Runnable {
             }
         }
     }
+
+    public void writePacket(ByteSerializable packet) {
+        synchronized (clientsLock) {
+            int index = 0;
+            while (index < clients.size()) {
+                if (clients.get(index).active()) {
+                    clients.get(index).writePacket(packet);
+                    index++;
+                } else {
+                    removeIndex(index);
+                }
+            }
+        }
+    }
 }

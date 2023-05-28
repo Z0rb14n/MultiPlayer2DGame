@@ -24,15 +24,21 @@ public class TestObjectServerIO {
         assertTrue(client.active());
     }
 
-    @Test
-    public void testClientToServer() {
+    private static TestPacket generatePacket() {
         Random random = new Random();
         TestPacket packet = new TestPacket();
+        //noinspection UnnecessaryUnicodeEscape
         packet.message = "Hello World! \r\n\r\u2603";
         packet.number = random.nextInt();
         packet.bool = random.nextBoolean();
         packet.bytes = new byte[10];
         random.nextBytes(packet.bytes);
+        return packet;
+    }
+
+    @Test
+    public void testClientToServer() {
+        TestPacket packet = generatePacket();
         byte[] bytesArray = packet.toByteArray();
         client.writeInt(bytesArray.length);
         client.writeInt(TestPacket.MAGIC_NUMBER);
@@ -56,14 +62,7 @@ public class TestObjectServerIO {
 
     @Test
     public void testBasicClient() {
-
-        Random random = new Random();
-        TestPacket packet = new TestPacket();
-        packet.message = "Hello World! \r\n\r\u2603";
-        packet.number = random.nextInt();
-        packet.bool = random.nextBoolean();
-        packet.bytes = new byte[10];
-        random.nextBytes(packet.bytes);
+        TestPacket packet = generatePacket();
         byte[] bytesArray = packet.toByteArray();
         client.writePacket(packet);
         serverWaitForNumBytesAvailable(bytesArray.length + 8, 3);
@@ -75,18 +74,11 @@ public class TestObjectServerIO {
         assertEquals(packet.number, deserializedPacket.number);
         assertEquals(packet.bool, deserializedPacket.bool);
         assertArrayEquals(packet.bytes, deserializedPacket.bytes);
-
     }
 
     @Test
     public void testServerToClient() {
-        Random random = new Random();
-        TestPacket packet = new TestPacket();
-        packet.message = "Hello World! \r\n\r\u2603";
-        packet.number = random.nextInt();
-        packet.bool = random.nextBoolean();
-        packet.bytes = new byte[10];
-        random.nextBytes(packet.bytes);
+        TestPacket packet = generatePacket();
         byte[] bytesArray = packet.toByteArray();
         server.writeInt(bytesArray.length);
         server.writeInt(TestPacket.MAGIC_NUMBER);
