@@ -21,9 +21,17 @@ public class TronServer implements NetworkEventReceiver {
     }
 
     @Override
+    public void dataReceivedEvent(BasicClient c) {
+    }
+
+    @Override
     public void disconnectEvent(BasicClient c) {
         if (c == clients[0]) clients[0] = null;
         else if (c == clients[1]) clients[1] = null;
         else System.out.println("Disconnected client not in clients list.");
+    }
+
+    @Override
+    public void endOfStreamEvent(BasicClient c) {
     }
 }

@@ -9,27 +9,23 @@ public interface NetworkEventReceiver {
      * @param s
      * @param c
      */
-    default void clientConnectionEvent(BasicServer s, BasicClient c) {
-    }
+    void clientConnectionEvent(BasicServer s, BasicClient c);
 
     /**
      * Runs when a client has received data from the server (called by ModifiedClient)
      * @param c
      */
-    default void dataReceivedEvent(BasicClient c) {
-    }
+    void dataReceivedEvent(BasicClient c);
 
     /**
      * Runs when a client disconnects from the server (called by ModifiedClient)
      * @param c
      */
-    default void disconnectEvent(BasicClient c) {
-    }
+    void disconnectEvent(BasicClient c);
 
     /**
      * Runs when a client encounters end-of-stream (e.g. host disconnect, kick)
      * @param c
      */
-    default void endOfStreamEvent(BasicClient c) {
-    }
+    void endOfStreamEvent(BasicClient c);
 }
