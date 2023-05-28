@@ -6,6 +6,12 @@ public interface ByteSerializable {
 
     int getMagicNumber();
 
+    /**
+     * Returns the byte array representation of this object.
+     * <p></p>
+     * Note that the returned byte array does not include magic numbers and byte array length.
+     * @return the byte array representation of this object
+     */
     byte[] toByteArray();
 
     static void writeInt(int value, byte[] bytes, int startIndex) {
