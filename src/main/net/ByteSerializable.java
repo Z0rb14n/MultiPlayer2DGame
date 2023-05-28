@@ -3,6 +3,9 @@ package net;
 import java.nio.ByteBuffer;
 
 public interface ByteSerializable {
+
+    int getMagicNumber();
+
     byte[] toByteArray();
 
     static void writeInt(int value, byte[] bytes, int startIndex) {

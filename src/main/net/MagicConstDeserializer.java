@@ -11,7 +11,6 @@ public class MagicConstDeserializer {
         assert data.length >= offset + 4;
         int magic = ByteSerializable.readInt(offset, data);
         ByteSerializableFactory<?> factory = factories.get(magic);
-        System.out.printf("%x\n", magic);
         if (factory != null) {
             return factory.deserialize(data, offset + 4);
         }

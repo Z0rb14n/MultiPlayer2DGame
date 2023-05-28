@@ -11,7 +11,7 @@ import java.util.Random;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class TestObjectServerIO {
+public class TestObjectArrayIO {
     private static final int PORT = 5204;
     private static BasicServer server;
     private static BasicClient client;
@@ -24,8 +24,7 @@ public class TestObjectServerIO {
         assertTrue(client.active());
     }
 
-    @Test
-    public void testClientToServer() {
+    private static TestPacket createPacket() {
         Random random = new Random();
         TestPacket packet = new TestPacket();
         packet.message = "Hello World! \r\n\r\u2603";
@@ -33,81 +32,57 @@ public class TestObjectServerIO {
         packet.bool = random.nextBoolean();
         packet.bytes = new byte[10];
         random.nextBytes(packet.bytes);
-        byte[] bytesArray = packet.toByteArray();
-        client.writeInt(bytesArray.length);
-        client.writeInt(TestPacket.MAGIC_NUMBER);
-        client.writeBytes(bytesArray);
-
-        serverWaitForNumBytesAvailable(bytesArray.length + 8, 3);
-        int length = server.available().readInt();
-        assertEquals(bytesArray.length, length);
-        byte[] returnedBytes = server.available().readBytes(length+4);
-        ByteSerializable deserialized = MagicConstDeserializer.deserialize(returnedBytes, 0);
-
-        assertNotNull(deserialized);
-        assertInstanceOf(TestPacket.class, deserialized);
-        TestPacket deserializedPacket = (TestPacket) deserialized;
-
-        assertEquals(packet.message, deserializedPacket.message);
-        assertEquals(packet.number, deserializedPacket.number);
-        assertEquals(packet.bool, deserializedPacket.bool);
-        assertArrayEquals(packet.bytes, deserializedPacket.bytes);
+        return packet;
     }
 
     @Test
     public void testBasicClient() {
-
-        Random random = new Random();
-        TestPacket packet = new TestPacket();
-        packet.message = "Hello World! \r\n\r\u2603";
-        packet.number = random.nextInt();
-        packet.bool = random.nextBoolean();
-        packet.bytes = new byte[10];
-        random.nextBytes(packet.bytes);
-        byte[] bytesArray = packet.toByteArray();
-        client.writePacket(packet);
+        TestPacket packet = createPacket();
+        TestPacket packet1 = createPacket();
+        TestPacket packet2 = createPacket();
+        ByteSerializableArray array = new ByteSerializableArray(new ByteSerializable[]{packet1, packet2});
+        ByteSerializableArray array1 = new ByteSerializableArray(new ByteSerializable[]{packet, array});
+        client.writePacket(array1);
+        byte[] bytesArray = array1.toByteArray();
         serverWaitForNumBytesAvailable(bytesArray.length + 8, 3);
         ByteSerializable deserialized = server.available().readPacket();
         assertNotNull(deserialized);
-        assertInstanceOf(TestPacket.class, deserialized);
-        TestPacket deserializedPacket = (TestPacket) deserialized;
+        assertTrue(deserialized instanceof ByteSerializableArray);
+        ByteSerializableArray deserializedArray = (ByteSerializableArray) deserialized;
+        assertEquals(2, deserializedArray.getArray().length);
+
+        ByteSerializable deserialized1 = deserializedArray.getArray()[0];
+        assertNotNull(deserialized1);
+        assertTrue(deserialized1 instanceof TestPacket);
+        TestPacket deserializedPacket = (TestPacket) deserialized1;
         assertEquals(packet.message, deserializedPacket.message);
         assertEquals(packet.number, deserializedPacket.number);
         assertEquals(packet.bool, deserializedPacket.bool);
         assertArrayEquals(packet.bytes, deserializedPacket.bytes);
 
-    }
+        ByteSerializable deserialized2 = deserializedArray.getArray()[1];
+        assertNotNull(deserialized2);
+        assertTrue(deserialized2 instanceof ByteSerializableArray);
+        ByteSerializableArray deserializedArray1 = (ByteSerializableArray) deserialized2;
+        assertEquals(2, deserializedArray1.getArray().length);
 
-    @Test
-    public void testServerToClient() {
-        Random random = new Random();
-        TestPacket packet = new TestPacket();
-        packet.message = "Hello World! \r\n\r\u2603";
-        packet.number = random.nextInt();
-        packet.bool = random.nextBoolean();
-        packet.bytes = new byte[10];
-        random.nextBytes(packet.bytes);
-        byte[] bytesArray = packet.toByteArray();
-        server.writeInt(bytesArray.length);
-        server.writeInt(TestPacket.MAGIC_NUMBER);
-        server.writeBytes(bytesArray);
+        ByteSerializable deserialized3 = deserializedArray1.getArray()[0];
+        assertNotNull(deserialized3);
+        assertTrue(deserialized3 instanceof TestPacket);
+        TestPacket deserializedPacket1 = (TestPacket) deserialized3;
+        assertEquals(packet1.message, deserializedPacket1.message);
+        assertEquals(packet1.number, deserializedPacket1.number);
+        assertEquals(packet1.bool, deserializedPacket1.bool);
+        assertArrayEquals(packet1.bytes, deserializedPacket1.bytes);
 
-        waitForNumBytesAvailable(bytesArray.length + 8, 3);
-        int length = client.readInt();
-        assertEquals(bytesArray.length, length);
-        byte[] returnedBytes = client.readBytes(length+4);
-
-        MagicConstDeserializer.registerFactory(TestPacket.MAGIC_NUMBER, new TestPacketFactory());
-        ByteSerializable deserialized = MagicConstDeserializer.deserialize(returnedBytes, 0);
-
-        assertNotNull(deserialized);
-        assertInstanceOf(TestPacket.class, deserialized);
-        TestPacket deserializedPacket = (TestPacket) deserialized;
-
-        assertEquals(packet.message, deserializedPacket.message);
-        assertEquals(packet.number, deserializedPacket.number);
-        assertEquals(packet.bool, deserializedPacket.bool);
-        assertArrayEquals(packet.bytes, deserializedPacket.bytes);
+        ByteSerializable deserialized4 = deserializedArray1.getArray()[1];
+        assertNotNull(deserialized4);
+        assertTrue(deserialized4 instanceof TestPacket);
+        TestPacket deserializedPacket2 = (TestPacket) deserialized4;
+        assertEquals(packet2.message, deserializedPacket2.message);
+        assertEquals(packet2.number, deserializedPacket2.number);
+        assertEquals(packet2.bool, deserializedPacket2.bool);
+        assertArrayEquals(packet2.bytes, deserializedPacket2.bytes);
     }
 
     private static void waitForNumBytesAvailable(int num, int retryCount) {

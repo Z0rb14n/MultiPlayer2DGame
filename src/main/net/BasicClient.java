@@ -494,6 +494,20 @@ public class BasicClient implements Runnable {
         return ByteBuffer.wrap(readBytes(4)).getFloat();
     }
 
+    public void writePacket(ByteSerializable packet) {
+        byte[] bytes = packet.toByteArray();
+        writeInt(bytes.length);
+        writeInt(packet.getMagicNumber());
+        writeBytes(bytes);
+    }
+
+    public ByteSerializable readPacket() {
+        assert available() > 4;
+        int length = readInt();
+        byte[] bytes = readBytes(length+4);
+        return MagicConstDeserializer.deserialize(bytes, 0);
+    }
+
 
     public void writeBytes(byte[] data) {
         try {
