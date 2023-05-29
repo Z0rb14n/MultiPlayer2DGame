@@ -18,8 +18,16 @@ public interface ByteSerializable {
         ByteBuffer.wrap(bytes, startIndex, 4).putInt(value);
     }
 
+    static void writeFloat(float val, byte[] bytes, int startIndex) {
+        ByteBuffer.wrap(bytes, startIndex, 4).putFloat(val);
+    }
+
     static int readInt(int index, byte[] data) {
         return ByteBuffer.wrap(data, index, 4).getInt();
+    }
+
+    static float readFloat(int index, byte[] data) {
+        return ByteBuffer.wrap(data, index, 4).getFloat();
     }
 }
 
