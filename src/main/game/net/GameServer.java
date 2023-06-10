@@ -1,11 +1,15 @@
-package net;
+package game.net;
+
+import net.BasicClient;
+import net.BasicServer;
+import net.NetworkEventReceiver;
 
 import java.io.IOException;
 
-public class TronServer implements NetworkEventReceiver {
+public class GameServer implements NetworkEventReceiver {
     private BasicClient[] clients = new BasicClient[2]; // player 1, player 2
     private BasicServer server;
-    public TronServer() {
+    public GameServer() {
         try {
             server = new BasicServer(NetworkConstants.PORT);
             server.addNetworkEventReceiver(this);

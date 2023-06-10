@@ -1,6 +1,9 @@
-package net;
+package game.net;
 
 import game.PlayerID;
+import net.ByteSerializable;
+import net.ByteSerializableFactory;
+import net.MagicConstDeserializer;
 
 public class InitGameInfoPacket implements ByteSerializable {
     static {

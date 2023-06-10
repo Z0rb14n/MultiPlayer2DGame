@@ -1,23 +1,24 @@
-package net;
+package game.net;
 
 import game.PlayerID;
+import net.ByteSerializable;
+import net.ByteSerializableFactory;
+import net.MagicConstDeserializer;
 import physics.Vec2D;
 
-public class VehiclePacket implements ByteSerializable {
-    static final int MAGIC_NUMBER = 0xAAAA6969;
+public class BallPacket implements ByteSerializable {
+    static final int MAGIC_NUMBER = 0xAAAA4200;
     static {
-        MagicConstDeserializer.registerFactory(VehiclePacket.MAGIC_NUMBER, new VehiclePacket.VehiclePacketFactory());
+        MagicConstDeserializer.registerFactory(BallPacket.MAGIC_NUMBER, new BallPacketFactory());
     }
     private final Vec2D position;
     private final Vec2D velocity;
     private final PlayerID id;
-    private final float angle;
 
-    public VehiclePacket(Vec2D position, Vec2D velocity, PlayerID id, float angle) {
+    public BallPacket(Vec2D position, Vec2D velocity, PlayerID id) {
         this.position = position;
         this.velocity = velocity;
         this.id = id;
-        this.angle = angle;
     }
 
     @Override
@@ -38,19 +39,16 @@ public class VehiclePacket implements ByteSerializable {
         ByteSerializable.writeFloat(velocity.getY(), bytes, index);
         index += 4;
         ByteSerializable.writeInt(id.getID(), bytes, index);
-        index += 4;
-        ByteSerializable.writeFloat(angle, bytes, index);
         return bytes;
     }
 
-    private static class VehiclePacketFactory implements ByteSerializableFactory<VehiclePacket> {
+    private static class BallPacketFactory implements ByteSerializableFactory<BallPacket> {
         @Override
-        public VehiclePacket deserialize(byte[] data, int index) {
+        public BallPacket deserialize(byte[] data, int index) {
             Vec2D position = new Vec2D(ByteSerializable.readFloat(index, data), ByteSerializable.readFloat(index + 4, data));
             Vec2D velocity = new Vec2D(ByteSerializable.readFloat(index + 8, data), ByteSerializable.readFloat(index + 12, data));
             PlayerID id = new PlayerID(ByteSerializable.readInt(index + 16, data));
-            float angle = ByteSerializable.readFloat(index + 20, data);
-            return new VehiclePacket(position, velocity, id, angle);
+            return new BallPacket(position, velocity, id);
         }
     }
 }

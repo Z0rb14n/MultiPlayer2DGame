@@ -1,4 +1,4 @@
-package ui;
+package ui.client;
 
 import game.GameController;
 import game.GameLogger;

@@ -1,4 +1,4 @@
-package ui;
+package ui.client;
 
 import game.GameController;
 
@@ -32,7 +32,6 @@ class MainFrame extends JFrame {
     }
 
     public static void main(String[] args) {
-        @SuppressWarnings("unused")
-        MainFrame frame = getInstance();
+        getInstance();
     }
 }

@@ -3,8 +3,10 @@ package net;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -24,6 +26,17 @@ public class BasicClient implements Runnable {
     private int bufferIndex;
     private int bufferLast;
 
+    public BasicClient(String host, int port, int timeout) throws IOException {
+        this.socket = new Socket();
+        socket.connect(new InetSocketAddress(host, port), timeout);
+        socket.setSoTimeout(timeout);
+
+        input = socket.getInputStream();
+        output = socket.getOutputStream();
+
+        thread = new Thread(this);
+        thread.start();
+    }
 
     /**
      * @param host address of the server

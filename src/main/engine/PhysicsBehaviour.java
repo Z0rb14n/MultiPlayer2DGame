@@ -13,6 +13,7 @@ public class PhysicsBehaviour implements GameObjectBehaviour {
     private float mass;
     private float coefOfRestitution = 1f;
     private int collisionMask = 0xffffffff;
+    private int antiCollisionMask = 0;
     private final PhysicsEngine engine;
     private final GameObject parent;
 
@@ -83,8 +84,16 @@ public class PhysicsBehaviour implements GameObjectBehaviour {
         return collisionMask;
     }
 
+    public int getAntiCollisionMask() {
+        return antiCollisionMask;
+    }
+
     public void setCollisionMask(int collisionMask) {
         this.collisionMask = collisionMask;
+    }
+
+    public void setAntiCollisionMask(int antiCollisionMask) {
+        this.antiCollisionMask = antiCollisionMask;
     }
 
     public void setCoefOfRestitution(float coefOfRestitution) {
