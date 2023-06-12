@@ -41,7 +41,7 @@ class MainPanel extends JPanel implements KeyListener {
         //noinspection SwitchStatementWithTooFewBranches
         switch (pop) {
             case CREATE_BALL:
-                controller.createBall();
+                controller.createBall((VehicleObject) controller.getPlayer());
                 break;
             default:
                 break;

@@ -11,7 +11,7 @@ public class VehicleObject extends GameObject {
     public static int VEHICLE_COLLISION_MASK = 0b10;
     private final RotatedTriangle triangle;
     private final PhysicsBehaviour behaviour;
-    private static final float maxSpeed = 400;
+    private static final float maxSpeed = 300;
     private static final Vec2D[] vertices = new Vec2D[3];
     static {
         vertices[0] = new Vec2D(-10,10);

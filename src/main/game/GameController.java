@@ -4,6 +4,7 @@ import engine.*;
 import physics.*;
 import physics.broad.SpatialGrid;
 import physics.shape.AxisAlignedBoundingBox;
+import physics.shape.RotatedTriangle;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -63,11 +64,12 @@ public class GameController {
 
     }
 
-    public void createBall() {
-        Vec2D playerPos = player.getBehaviour(PhysicsBehaviour.class).getPosition();
-        Vec2D playerVel = player.getBehaviour(PhysicsBehaviour.class).getVelocity();
-        Vec2D ballPos = playerPos.add(playerVel.normalize().scaleTo(10));
-        BallObject bo = new BallObject(engine, hierarchy.getRoot(), ballPos, new Vec2D(100,100));
+    public void createBall(VehicleObject object) {
+        PhysicsBehaviour playerBehaviour = object.getBehaviour(PhysicsBehaviour.class);
+        Vec2D playerPos = playerBehaviour.getPosition();
+        Vec2D dir = Vec2D.UP.rotated(((RotatedTriangle)playerBehaviour.getShape()).getAngle());
+        Vec2D ballPos = playerPos.add(dir.mult(10));
+        BallObject bo = new BallObject(engine, hierarchy.getRoot(), ballPos, dir.mult(350));
         balls.add(bo);
         hierarchy.addObject(bo);
     }
@@ -76,17 +78,12 @@ public class GameController {
         return player;
     }
 
-    int count = 0;
     public void render(Graphics2D g) {
         Time.deltaTime = (System.nanoTime() - Time.lastRenderNano) / 1000000000f;
         hierarchy.update();
         hierarchy.render(g);
         engine.getBroadphaseStructure().render(g, Color.BLACK);
         Time.lastRenderNano = System.nanoTime();
-        count++;
-        if ((count % 1000) == 999) {
-            System.out.println("lol");
-        }
     }
 
     public void update() {
