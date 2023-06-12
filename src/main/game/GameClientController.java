@@ -32,18 +32,7 @@ public class GameClientController implements NetworkEventReceiver {
             client.addNetworkEventReceiver(this);
             GameLogger.getDefault().log("Client instantiated.", "NETWORK");
             InitGameInfoPacket.ensureFactoryInitialized();
-            ByteSerializable packet = null;
-            for (int i = 0; i < 500; i++) {
-                packet = client.readPacket();
-                if (packet != null) {
-                    break;
-                }
-                try {
-                    Thread.sleep(1);
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-            }
+            ByteSerializable packet = spinReadPacket(500);
             if (packet == null) {
                 GameLogger.getDefault().log("Packet was null.", "NETWORK");
                 client.stop();
@@ -82,6 +71,22 @@ public class GameClientController implements NetworkEventReceiver {
 
     public int getPlayerNumber() {
         return playerNumber;
+    }
+
+    private ByteSerializable spinReadPacket(int retries) {
+        return spinReadPacket(retries, 1);
+    }
+    private ByteSerializable spinReadPacket(int retries, long sleep) {
+        for (int i = 0; i < retries; i++) {
+            ByteSerializable packet = client.readPacket();
+            if (packet != null) return packet;
+            try {
+                Thread.sleep(sleep);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
+        return null;
     }
 
     @Override
