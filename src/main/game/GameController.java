@@ -4,7 +4,6 @@ import engine.*;
 import physics.*;
 import physics.broad.SpatialGrid;
 import physics.shape.AxisAlignedBoundingBox;
-import physics.shape.RotatedTriangle;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -33,29 +32,14 @@ public class GameController {
         engine = new PhysicsEngine(new SpatialGrid<>(new Vec2D(50,50)));
         createBoundingBoxes();
         // create test vehicle
-        player = addTestVehicle();
+        player = addVehicle(new Vec2D(100,100));
     }
 
-    public GameObject addTestVehicle() {
-        GameObject v = createVehicle(new Vec2D(100,100));
+    public GameObject addVehicle(Vec2D pos) {
+        GameObject v = new VehicleObject(engine, pos);
         hierarchy.addObject(v);
         vehicles.add(v);
         return v;
-    }
-
-    private GameObject createVehicle(Vec2D position) {
-        Vec2D[] vertices = new Vec2D[3];
-        vertices[0] = new Vec2D(-10,0);
-        vertices[1] = new Vec2D(10,0);
-        vertices[2] = new Vec2D(0,-20);
-        RotatedTriangle triangle = new RotatedTriangle(vertices);
-        GameObject gameObject = new GameObject(position);
-        PhysicsBehaviour behaviour = new PhysicsBehaviour(gameObject,engine,triangle,false);
-        behaviour.setCollisionMask(VEHICLE_COLLISION_MASK);
-        gameObject.addBehaviour(behaviour);
-        RotatedTriangleRenderer renderer = new RotatedTriangleRenderer(gameObject, Color.RED, true);
-        gameObject.addBehaviour(renderer);
-        return gameObject;
     }
 
     private GameObject createBoundingBox(AxisAlignedBoundingBox box) {

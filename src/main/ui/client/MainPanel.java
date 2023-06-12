@@ -3,6 +3,7 @@ package ui.client;
 import game.GameController;
 import game.GameLogger;
 import engine.PhysicsBehaviour;
+import game.VehicleObject;
 import physics.Vec2D;
 
 import javax.swing.*;
@@ -55,33 +56,24 @@ class MainPanel extends JPanel implements KeyListener {
 
     private void handleInputs() {
         float forceAmount = 0.2f;
-        float maxSpeed = 400;
-        Vec2D force = new Vec2D(0,0);
+        float force = 0;
+        VehicleObject object = (VehicleObject) controller.getPlayer();
+
         if (pressedKeyCodes.contains(KeyEvent.VK_W)) {
-            force = force.add(new Vec2D(0,-forceAmount));
+            force -= forceAmount;
         }
         if (pressedKeyCodes.contains(KeyEvent.VK_A)) {
-            force = force.add(new Vec2D(-forceAmount,0));
+            //force = force.add(new Vec2D(-forceAmount,0));
+            object.rotate(-0.03f);
         }
         if (pressedKeyCodes.contains(KeyEvent.VK_S)) {
-            force = force.add(new Vec2D(0,forceAmount));
+            force += forceAmount;
         }
         if (pressedKeyCodes.contains(KeyEvent.VK_D)) {
-            force = force.add(new Vec2D(forceAmount,0));
+            //force = force.add(new Vec2D(forceAmount,0));
+            object.rotate(0.03f);
         }
-        PhysicsBehaviour triangle = controller.getPlayer().getBehaviour(PhysicsBehaviour.class);
-        if (Vec2D.ZERO.equals(force)) {
-            if (triangle.getVelocity().sqMag() < 0.1) {
-                triangle.setVelocity(Vec2D.ZERO);
-            } else {
-                triangle.setVelocity(triangle.getVelocity().mult(0.9f));
-            }
-        } else {
-            triangle.setVelocity(triangle.getVelocity().add(force.mult(80)));
-        }
-        if (triangle.getVelocity().sqMag() > maxSpeed * maxSpeed) {
-            triangle.setVelocity(triangle.getVelocity().scaleTo(maxSpeed));
-        }
+        object.accelerate(force);
     }
 
 
