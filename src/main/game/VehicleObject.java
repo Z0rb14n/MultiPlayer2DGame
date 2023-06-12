@@ -9,15 +9,17 @@ import java.awt.*;
 
 public class VehicleObject extends GameObject {
     public static int VEHICLE_COLLISION_MASK = 0b10;
-    private RotatedTriangle triangle;
-    private PhysicsBehaviour behaviour;
-    private float maxSpeed = 400;
+    private final RotatedTriangle triangle;
+    private final PhysicsBehaviour behaviour;
+    private static final float maxSpeed = 400;
+    private static final Vec2D[] vertices = new Vec2D[3];
+    static {
+        vertices[0] = new Vec2D(-10,10);
+        vertices[1] = new Vec2D(10,10);
+        vertices[2] = new Vec2D(0,-10);
+    }
     public VehicleObject(PhysicsEngine engine, Vec2D position) {
         super(position);
-        Vec2D[] vertices = new Vec2D[3];
-        vertices[0] = new Vec2D(-10,0);
-        vertices[1] = new Vec2D(10,0);
-        vertices[2] = new Vec2D(0,-20);
         triangle = new RotatedTriangle(vertices);
         behaviour = new PhysicsBehaviour(this,engine,triangle,false);
         behaviour.setCollisionMask(VEHICLE_COLLISION_MASK);
@@ -28,6 +30,7 @@ public class VehicleObject extends GameObject {
 
     public void rotate(float angle) {
         triangle.rotate(angle);
+        behaviour.setShape(triangle); // screws with the shape; reset it
     }
 
     public void accelerate(float amount) {
@@ -47,6 +50,4 @@ public class VehicleObject extends GameObject {
             behaviour.setVelocity(behaviour.getVelocity().scaleTo(maxSpeed));
         }
     }
-
-
 }

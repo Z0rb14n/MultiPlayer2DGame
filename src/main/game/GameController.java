@@ -52,10 +52,10 @@ public class GameController {
     }
 
     private void createBoundingBoxes() {
-        AxisAlignedBoundingBox top = new AxisAlignedBoundingBox(new Vec2D(-500, -500), new Vec2D(GAME_WIDTH + 500, 20));
-        AxisAlignedBoundingBox bot = new AxisAlignedBoundingBox(new Vec2D(-500, GAME_HEIGHT - 20), new Vec2D(GAME_WIDTH + 500, GAME_HEIGHT + 500));
-        AxisAlignedBoundingBox left = new AxisAlignedBoundingBox(new Vec2D(-500, -500), new Vec2D(20, GAME_HEIGHT + 500));
-        AxisAlignedBoundingBox right = new AxisAlignedBoundingBox(new Vec2D(GAME_WIDTH - 20, -500), new Vec2D(GAME_WIDTH + 500, GAME_HEIGHT + 500));
+        AxisAlignedBoundingBox top = new AxisAlignedBoundingBox(new Vec2D(-100, -100), new Vec2D(GAME_WIDTH + 100, 20));
+        AxisAlignedBoundingBox bot = new AxisAlignedBoundingBox(new Vec2D(-100, GAME_HEIGHT - 20), new Vec2D(GAME_WIDTH + 100, GAME_HEIGHT + 100));
+        AxisAlignedBoundingBox left = new AxisAlignedBoundingBox(new Vec2D(-100, -100), new Vec2D(20, GAME_HEIGHT + 100));
+        AxisAlignedBoundingBox right = new AxisAlignedBoundingBox(new Vec2D(GAME_WIDTH - 20, -100), new Vec2D(GAME_WIDTH + 100, GAME_HEIGHT + 100));
         hierarchy.addObject(createBoundingBox(top));
         hierarchy.addObject(createBoundingBox(bot));
         hierarchy.addObject(createBoundingBox(left));
@@ -76,12 +76,17 @@ public class GameController {
         return player;
     }
 
+    int count = 0;
     public void render(Graphics2D g) {
         Time.deltaTime = (System.nanoTime() - Time.lastRenderNano) / 1000000000f;
         hierarchy.update();
         hierarchy.render(g);
         engine.getBroadphaseStructure().render(g, Color.BLACK);
         Time.lastRenderNano = System.nanoTime();
+        count++;
+        if ((count % 1000) == 999) {
+            System.out.println("lol");
+        }
     }
 
     public void update() {
