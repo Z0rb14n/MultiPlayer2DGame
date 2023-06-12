@@ -1,6 +1,5 @@
 package game.net;
 
-import game.PlayerID;
 import net.ByteSerializable;
 import net.ByteSerializableFactory;
 import net.MagicConstDeserializer;
@@ -13,9 +12,9 @@ public class BallPacket implements ByteSerializable {
     }
     private final Vec2D position;
     private final Vec2D velocity;
-    private final PlayerID id;
+    private final int id;
 
-    public BallPacket(Vec2D position, Vec2D velocity, PlayerID id) {
+    public BallPacket(Vec2D position, Vec2D velocity, int id) {
         this.position = position;
         this.velocity = velocity;
         this.id = id;
@@ -38,7 +37,7 @@ public class BallPacket implements ByteSerializable {
         index += 4;
         ByteSerializable.writeFloat(velocity.getY(), bytes, index);
         index += 4;
-        ByteSerializable.writeInt(id.getID(), bytes, index);
+        ByteSerializable.writeInt(id, bytes, index);
         return bytes;
     }
 
@@ -47,7 +46,7 @@ public class BallPacket implements ByteSerializable {
         public BallPacket deserialize(byte[] data, int index) {
             Vec2D position = new Vec2D(ByteSerializable.readFloat(index, data), ByteSerializable.readFloat(index + 4, data));
             Vec2D velocity = new Vec2D(ByteSerializable.readFloat(index + 8, data), ByteSerializable.readFloat(index + 12, data));
-            PlayerID id = new PlayerID(ByteSerializable.readInt(index + 16, data));
+            int id = ByteSerializable.readInt(index + 16, data);
             return new BallPacket(position, velocity, id);
         }
     }

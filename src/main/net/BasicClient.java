@@ -170,8 +170,7 @@ public class BasicClient implements Runnable {
                                 int newSize = Integer.highestOneBit(bufferLength + readCount - 1) << 1;
                                 if (newSize > MAX_BUFFER_SIZE) {
                                     // buffer is full because client is not reading (fast enough)
-                                    System.err.println("Client: can't receive more data, buffer is full. " +
-                                            "Make sure you read the data from the client.");
+                                    System.err.println("Client: can't receive more data, buffer is full.");
                                     stop();
                                     return;
                                 }
@@ -193,7 +192,6 @@ public class BasicClient implements Runnable {
                         networkEventReceiver.dataReceivedEvent(this);
                 }
             } catch (IOException e) {
-                //errorMessage("run", e);
                 e.printStackTrace();
             }
         }
@@ -205,7 +203,7 @@ public class BasicClient implements Runnable {
      * into any trouble.
      */
     public boolean active() {
-        return (thread != null);
+        return thread != null;
     }
 
 
@@ -520,7 +518,6 @@ public class BasicClient implements Runnable {
         byte[] bytes = readBytes(length+4);
         return MagicConstDeserializer.deserialize(bytes, 0);
     }
-
 
     public void writeBytes(byte[] data) {
         try {
