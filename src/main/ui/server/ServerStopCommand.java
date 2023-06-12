@@ -10,5 +10,6 @@ class ServerStopCommand implements ServerCommand {
             System.out.println("Ignored arguments in stop command: " + String.join(" ",args));
         }
         ServerCLI.getInstance().stop();
+        System.exit(0);
     }
 }

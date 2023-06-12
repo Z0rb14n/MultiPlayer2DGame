@@ -4,7 +4,7 @@ import engine.*;
 import physics.*;
 import physics.broad.SpatialGrid;
 import physics.shape.AxisAlignedBoundingBox;
-import physics.shape.Triangle;
+import physics.shape.RotatedTriangle;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -20,7 +20,7 @@ public class GameController {
     private final ArrayList<GameObject> vehicles = new ArrayList<>();
     private final ArrayList<BallObject> balls = new ArrayList<>();
     private final SceneHierarchy hierarchy = new SceneHierarchy();
-    private final GameObject player;
+    private GameObject player;
     private static int GAME_SPEED = 3;
     private static GameController singleton;
     public static GameController getInstance() {
@@ -33,19 +33,27 @@ public class GameController {
         engine = new PhysicsEngine(new SpatialGrid<>(new Vec2D(50,50)));
         createBoundingBoxes();
         // create test vehicle
+        player = addTestVehicle();
+    }
+
+    public GameObject addTestVehicle() {
         GameObject v = createVehicle(new Vec2D(100,100));
         hierarchy.addObject(v);
         vehicles.add(v);
-        player = v;
+        return v;
     }
 
     private GameObject createVehicle(Vec2D position) {
-        Triangle triangle = new Triangle(new Vec2D(-10,0), new Vec2D(10,0), new Vec2D(0,20));
+        Vec2D[] vertices = new Vec2D[3];
+        vertices[0] = new Vec2D(-10,0);
+        vertices[1] = new Vec2D(10,0);
+        vertices[2] = new Vec2D(0,-20);
+        RotatedTriangle triangle = new RotatedTriangle(vertices);
         GameObject gameObject = new GameObject(position);
         PhysicsBehaviour behaviour = new PhysicsBehaviour(gameObject,engine,triangle,false);
         behaviour.setCollisionMask(VEHICLE_COLLISION_MASK);
         gameObject.addBehaviour(behaviour);
-        TriangleRenderer renderer = new TriangleRenderer(gameObject, Color.RED, true);
+        RotatedTriangleRenderer renderer = new RotatedTriangleRenderer(gameObject, Color.RED, true);
         gameObject.addBehaviour(renderer);
         return gameObject;
     }

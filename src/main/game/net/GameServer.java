@@ -1,27 +1,31 @@
 package game.net;
 
+import game.GameController;
 import net.BasicClient;
 import net.BasicServer;
 import net.NetworkEventReceiver;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class GameServer implements NetworkEventReceiver {
-    private BasicClient[] clients = new BasicClient[2]; // player 1, player 2
-    private BasicServer server;
-    public GameServer() {
-        try {
-            server = new BasicServer(NetworkConstants.PORT);
-            server.addNetworkEventReceiver(this);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    private final ArrayList<BasicClient> clients = new ArrayList<>();
+    private final BasicServer server;
+    private final GameController controller = GameController.getInstance();
+    public GameServer() throws IOException {
+        server = new BasicServer(NetworkConstants.PORT);
+        server.addNetworkEventReceiver(this);
     }
 
     @Override
     public void clientConnectionEvent(BasicServer s, BasicClient c) {
         assert(s == server);
+        clients.add(c);
 
+    }
+
+    public void update() {
+        controller.update();
     }
 
     @Override
@@ -30,9 +34,7 @@ public class GameServer implements NetworkEventReceiver {
 
     @Override
     public void disconnectEvent(BasicClient c) {
-        if (c == clients[0]) clients[0] = null;
-        else if (c == clients[1]) clients[1] = null;
-        else System.out.println("Disconnected client not in clients list.");
+        clients.remove(c);
     }
 
     @Override

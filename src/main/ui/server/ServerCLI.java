@@ -1,35 +1,49 @@
 package ui.server;
 
-import javax.swing.*;
+import game.net.GameServer;
+
+import java.util.Timer;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Scanner;
+import java.util.TimerTask;
 
 public class ServerCLI {
     private static ServerCLI singleton;
-    private final Timer timer;
+    private Timer timer;
     private final HashMap<String,ServerCommand> commands = new HashMap<>();
+    private final GameServer server;
+    private final ServerCLITask task = new ServerCLITask();
     public static ServerCLI getInstance() {
         if (singleton == null) singleton = new ServerCLI();
         return singleton;
     }
 
     private ServerCLI() {
-        timer = new Timer(Math.floorDiv(1000,165), ae -> this.update());
-        timer.start();
-
+        try {
+            server = new GameServer();
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
         commands.put("stop",new ServerStopCommand());
+
+        timer = new Timer("ServerUpdateTimerThread",true);
+        timer.scheduleAtFixedRate(task,0, Math.floorDiv(1000,165));
     }
 
     private void update() {
-
+        server.update();
     }
 
     public boolean isActive() {
-        return timer.isRunning();
+        return timer != null;
     }
 
     public void stop() {
-        timer.stop();
+        task.cancel();
+        timer.cancel();
+        timer = null;
     }
 
     private void sendCommand(String command) {
@@ -52,6 +66,13 @@ public class ServerCLI {
             String command = scanner.nextLine().trim();
             if (command.isEmpty()) continue;
             cli.sendCommand(command);
+        }
+    }
+
+    private class ServerCLITask extends TimerTask {
+        @Override
+        public void run() {
+            update();
         }
     }
 }

@@ -7,6 +7,7 @@ import physics.Vec2D;
 import physics.broad.SpatialGrid;
 import physics.shape.AxisAlignedBoundingBox;
 import physics.shape.Circle;
+import physics.shape.RotatedRectangle;
 import physics.shape.Triangle;
 
 import javax.swing.*;
@@ -37,6 +38,7 @@ public class EngineTestUIFrame extends SimpleTestFrame {
         //private final PhysicsEngine engine = new PhysicsEngine(new Vec2D(800,600));
         private final PhysicsEngine engine = new PhysicsEngine(new SpatialGrid<>(new Vec2D(100,100)));
         private final PhysicsBehaviour triangle;
+        private final RotatedRectangle rotatedRectangle;
         private Vec2D prevMTV = Vec2D.ZERO;
         public EngineTestUIPanel() {
             super();
@@ -60,6 +62,13 @@ public class EngineTestUIFrame extends SimpleTestFrame {
 
             triangle = new PhysicsBehaviour(new GameObject(new Vec2D(400,400)), engine, new Triangle(new Vec2D(-10,0), new Vec2D(10,0), new Vec2D(0,20)), false);
             engine.add(triangle);
+
+            // create rotated rectangle
+            Vec2D bLeft = new Vec2D(400, 400);
+            rotatedRectangle = new RotatedRectangle(bLeft, 45, 45);
+            PhysicsBehaviour object = new PhysicsBehaviour(new GameObject(), engine, rotatedRectangle, true);
+            rotatedRectangle.rotate(45);
+            engine.add(object);
         }
 
         @Override
@@ -95,6 +104,18 @@ public class EngineTestUIFrame extends SimpleTestFrame {
             Vec2D vertexTwo = vertexOne.add(prevMTV.mult(10));
             graphics.setStroke(new BasicStroke(3));
             graphics.drawLine((int)vertexOne.getX(), (int)vertexOne.getY(), (int)vertexTwo.getX(), (int)vertexTwo.getY());
+
+            // render rotated rectangle
+            rotatedRectangle.rotate(0.01f);
+            graphics.setColor(Color.BLACK);
+            Vec2D[] vertices = rotatedRectangle.getVertices();
+            int[] xPoints = new int[vertices.length];
+            int[] yPoints = new int[vertices.length];
+            for (int i = 0; i < vertices.length; i++) {
+                xPoints[i] = (int)vertices[i].getX();
+                yPoints[i] = (int)vertices[i].getY();
+            }
+            g.fillPolygon(xPoints, yPoints, vertices.length);
 
             engine.getBroadphaseStructure().render(graphics, Color.BLACK);
         }
