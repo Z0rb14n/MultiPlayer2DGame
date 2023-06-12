@@ -31,9 +31,19 @@ public class GameClientController implements NetworkEventReceiver {
             client = new BasicClient(ip, NetworkConstants.PORT, 5000);
             client.addNetworkEventReceiver(this);
             GameLogger.getDefault().log("Client instantiated.", "NETWORK");
-            Thread.sleep(100);
             InitGameInfoPacket.ensureFactoryInitialized();
-            ByteSerializable packet = client.readPacket();
+            ByteSerializable packet = null;
+            for (int i = 0; i < 500; i++) {
+                packet = client.readPacket();
+                if (packet != null) {
+                    break;
+                }
+                try {
+                    Thread.sleep(1);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
             if (packet == null) {
                 GameLogger.getDefault().log("Packet was null.", "NETWORK");
                 client.stop();
@@ -67,8 +77,6 @@ public class GameClientController implements NetworkEventReceiver {
         } catch (IOException ex) {
             ex.printStackTrace();
             return NetworkInstantiationResult.FAILURE;
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
         }
     }
 

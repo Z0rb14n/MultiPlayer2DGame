@@ -1,6 +1,7 @@
 package ui.server;
 
 import game.net.GameServer;
+import game.net.NetworkConstants;
 
 import java.util.Timer;
 import java.io.IOException;
@@ -22,6 +23,7 @@ public class ServerCLI {
     private ServerCLI() {
         try {
             server = new GameServer();
+            System.out.println("Server started on port " + NetworkConstants.PORT);
         } catch (IOException e) {
             e.printStackTrace();
             throw new RuntimeException(e);

@@ -6,7 +6,6 @@ import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketException;
-import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -345,96 +344,6 @@ public class BasicClient implements Runnable {
         }
     }
 
-
-    /**
-     * Reads from the port into a buffer of bytes up to and including a
-     * particular character. If the character isn't in the buffer, 'null' is
-     * returned. The version with no <b>byteBuffer</b> parameter returns a byte
-     * array of all data up to and including the <b>interesting</b> byte. This
-     * is not efficient, but is easy to use. The version with the
-     * <b>byteBuffer</b> parameter is more memory and time efficient. It grabs
-     * the data in the buffer and puts it into the byte array passed in and
-     * returns an int value for the number of bytes read. If the byte buffer is
-     * not large enough, -1 is returned and an error is printed to the message
-     * area. If nothing is in the buffer, 0 is returned.
-     *
-     * @param interesting character designated to mark the end of the data
-     */
-    public byte[] readBytesUntil(int interesting) {
-        byte what = (byte) interesting;
-
-        synchronized (bufferLock) {
-            if (bufferIndex == bufferLast) return null;
-
-            int found = -1;
-            for (int k = bufferIndex; k < bufferLast; k++) {
-                if (buffer[k] == what) {
-                    found = k;
-                    break;
-                }
-            }
-            if (found == -1) return null;
-
-            int length = found - bufferIndex + 1;
-            byte[] outgoing = new byte[length];
-            System.arraycopy(buffer, bufferIndex, outgoing, 0, length);
-
-            bufferIndex += length;
-            if (bufferIndex == bufferLast) {
-                bufferIndex = 0; // rewind
-                bufferLast = 0;
-            }
-            return outgoing;
-        }
-    }
-
-
-    /**
-     * Reads from the serial port into a buffer of bytes until a
-     * particular character. If the character isn't in the serial
-     * buffer, then 'null' is returned.
-     * <p></p>
-     * If outgoing[] is not big enough, then -1 is returned,
-     * and an error message is printed on the console.
-     * If nothing is in the buffer, zero is returned.
-     * If 'interesting' byte is not in the buffer, then 0 is returned.
-     *
-     * @param byteBuffer passed in byte array to be altered
-     */
-    public int readBytesUntil(int interesting, byte[] byteBuffer) {
-        byte what = (byte) interesting;
-
-        synchronized (bufferLock) {
-            if (bufferIndex == bufferLast) return 0;
-
-            int found = -1;
-            for (int k = bufferIndex; k < bufferLast; k++) {
-                if (buffer[k] == what) {
-                    found = k;
-                    break;
-                }
-            }
-            if (found == -1) return 0;
-
-            int length = found - bufferIndex + 1;
-            if (length > byteBuffer.length) {
-                System.err.println("readBytesUntil() byte buffer is" +
-                        " too small for the " + length +
-                        " bytes up to and including char " + interesting);
-                return -1;
-            }
-            System.arraycopy(buffer, bufferIndex, byteBuffer, 0, length);
-
-            bufferIndex += length;
-            if (bufferIndex == bufferLast) {
-                bufferIndex = 0;  // rewind
-                bufferLast = 0;
-            }
-            return length;
-        }
-    }
-
-
     /**
      * Returns the all the data from the buffer as a UTF8 String.
      */
@@ -444,20 +353,6 @@ public class BasicClient implements Runnable {
         return StandardCharsets.UTF_8.decode(ByteBuffer.wrap(b)).toString();
     }
 
-
-    /**
-     * Combination of {@link net.BasicClient#readBytesUntil(int, byte[])} and {@link BasicClient#readString()}. Returns
-     * <b>null</b> if it doesn't find what you're looking for.
-     *
-     * @param interesting character designated to mark the end of the data
-     */
-    public String readStringUntil(int interesting) {
-        byte[] b = readBytesUntil(interesting);
-        if (b == null) return null;
-        return StandardCharsets.UTF_8.decode(ByteBuffer.wrap(b)).toString();
-    }
-
-
     /**
      * Writes data to a server specified when constructing the client.
      *
@@ -465,7 +360,7 @@ public class BasicClient implements Runnable {
      */
     public void writeByte(byte data) {
         try {
-            output.write(data & 0xff);  // for good measure do the &
+            output.write(data);
             output.flush();   // hmm, not sure if a good idea
         } catch (Exception e) { // null pointer or serial port dead
             e.printStackTrace();
@@ -507,16 +402,32 @@ public class BasicClient implements Runnable {
 
     public void writePacket(ByteSerializable packet) {
         byte[] bytes = packet.toByteArray();
-        writeInt(bytes.length);
-        writeInt(packet.getMagicNumber());
-        writeBytes(bytes);
+        try {
+            output.write(ByteBuffer.allocate(4).putInt(bytes.length).array());
+            output.write(ByteBuffer.allocate(4).putInt(packet.getMagicNumber()).array());
+            output.write(bytes);
+            output.flush();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            stop();
+        }
     }
 
     public ByteSerializable readPacket() {
-        assert available() > 4;
-        int length = readInt();
-        byte[] bytes = readBytes(length+4);
-        return MagicConstDeserializer.deserialize(bytes, 0);
+        synchronized (bufferLock) {
+            int length = bufferLast - bufferIndex;
+            if (length < 8) return null; // 4 for length; 4 for magic const
+            int desiredLen = ByteBuffer.wrap(buffer,bufferIndex,4).getInt();
+            if (length < desiredLen + 8) return null;
+
+            bufferIndex += desiredLen+8;
+            if (bufferIndex == bufferLast) {
+                bufferIndex = 0;  // rewind
+                bufferLast = 0;
+            }
+
+            return MagicConstDeserializer.deserialize(buffer, bufferIndex+4);
+        }
     }
 
     public void writeBytes(byte[] data) {
