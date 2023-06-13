@@ -1,19 +1,19 @@
 package game;
 
-import engine.CircleRenderer;
-import engine.GameObject;
-import engine.PhysicsBehaviour;
-import engine.SceneHierarchyNode;
+import engine.*;
 import physics.PhysicsEngine;
 import physics.Vec2D;
 import physics.shape.Circle;
 
 import java.awt.*;
 
-public class BallObject extends GameObject {
+public class BallObject extends GameObject implements GameObjectBehaviour {
     public static int BALL_COLLISION_MASK = 0b01;
     public static int BALL_ANTI_COLLISION_MASK = 0b10;
+    public static int BALL_MAX_BOUNCES = 5;
     private final int id;
+    private final SceneHierarchyNode parent;
+    private int counter = 0;
     public BallObject(PhysicsEngine engine, SceneHierarchyNode node, Vec2D position, Vec2D velocity, int id) {
         super(position);
         Circle circle = new Circle(Vec2D.ZERO,2);
@@ -22,8 +22,8 @@ public class BallObject extends GameObject {
         behaviour.setAntiCollisionMask(BALL_ANTI_COLLISION_MASK);
         behaviour.setVelocity(velocity);
         addBehaviour(behaviour);
-        BallBehaviour ballBehaviour = new BallBehaviour(this, node);
-        addBehaviour(ballBehaviour);
+        this.parent = node;
+        addBehaviour(this);
         CircleRenderer renderer = new CircleRenderer(this, Color.MAGENTA, false);
         addBehaviour(renderer);
         this.id = id;
@@ -31,5 +31,27 @@ public class BallObject extends GameObject {
 
     public int getId() {
         return id;
+    }
+
+    public int getBounceCount() {
+        return counter;
+    }
+
+    @Override
+    public void physicsUpdate() {
+        Vec2D pos = getPosition();
+        //System.out.println(pos);
+        if (pos.getX() < 10 || pos.getX() > GameController.GAME_WIDTH-10 || pos.getY() < 10 || pos.getY() > GameController.GAME_HEIGHT-10) {
+            GameLogger.getDefault().log("BALL OUT OF BOUNDS: " + pos,"IGNORE");
+        }
+    }
+
+    @Override
+    public void onCollision(PhysicsBehaviour src, PhysicsBehaviour target, Vec2D mtv) {
+        counter++;
+        //GameLogger.getDefault().log("BOUNCE COUNT " + counter,"DEBUG");
+        if (counter > BALL_MAX_BOUNCES) {
+            parent.removeObject(this);
+        }
     }
 }

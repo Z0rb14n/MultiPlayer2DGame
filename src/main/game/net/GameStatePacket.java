@@ -50,7 +50,7 @@ public class GameStatePacket implements ByteSerializable {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         baos.write(balls.length);
         for (BallPacket ball : balls) {
-            baos.write(ball.toByteArray(), 0, 20);
+            baos.write(ball.toByteArray(), 0, BallPacket.PACKET_LEN);
         }
         baos.write(vehicles.length);
         for (VehiclePacket vehicle : vehicles) {
