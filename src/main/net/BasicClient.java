@@ -15,7 +15,7 @@ import java.util.ArrayList;
  */
 public class BasicClient implements Runnable {
     private static final int MAX_BUFFER_SIZE = 1 << 27; // 128 MB
-    private final ArrayList<NetworkEventReceiver> networkEventReceivers = new ArrayList<>(1);
+    private final ArrayList<ClientNetworkEventReceiver> networkEventReceivers = new ArrayList<>(1);
     private volatile Thread thread;
     private Socket socket;
     private InputStream input;
@@ -58,11 +58,11 @@ public class BasicClient implements Runnable {
         thread.start();
     }
 
-    public void addNetworkEventReceiver(NetworkEventReceiver networkEventReceiver) {
+    public void addNetworkEventReceiver(ClientNetworkEventReceiver networkEventReceiver) {
         networkEventReceivers.add(networkEventReceiver);
     }
 
-    public void removeNetworkEventReceiver(NetworkEventReceiver networkEventReceiver) {
+    public void removeNetworkEventReceiver(ClientNetworkEventReceiver networkEventReceiver) {
         networkEventReceivers.remove(networkEventReceiver);
     }
 
@@ -76,7 +76,7 @@ public class BasicClient implements Runnable {
      */
     public void stop() {
         if (thread != null) {
-            for (NetworkEventReceiver networkEventReceiver : networkEventReceivers)
+            for (ClientNetworkEventReceiver networkEventReceiver : networkEventReceivers)
                 networkEventReceiver.disconnectEvent(this);
         }
         dispose();
@@ -151,7 +151,7 @@ public class BasicClient implements Runnable {
                     // read returns -1 if end-of-stream occurs (for example if the host disappears)
                     if (readCount == -1) {
                         System.err.println("Client got end-of-stream.");
-                        for (NetworkEventReceiver networkEventReceiver : networkEventReceivers)
+                        for (ClientNetworkEventReceiver networkEventReceiver : networkEventReceivers)
                             networkEventReceiver.endOfStreamEvent(this);
                         stop();
                         return;
@@ -187,7 +187,7 @@ public class BasicClient implements Runnable {
                     }
 
                     // now post an event
-                    for (NetworkEventReceiver networkEventReceiver : networkEventReceivers)
+                    for (ClientNetworkEventReceiver networkEventReceiver : networkEventReceivers)
                         networkEventReceiver.dataReceivedEvent(this);
                 }
             } catch (IOException e) {

@@ -3,15 +3,14 @@ package game;
 import game.net.InitGameInfoPacket;
 import game.net.NetworkConstants;
 import net.BasicClient;
-import net.BasicServer;
 import net.ByteSerializable;
-import net.NetworkEventReceiver;
+import net.ClientNetworkEventReceiver;
 
 import java.io.IOException;
 import java.net.SocketException;
 import java.util.ArrayList;
 
-public class GameClientController implements NetworkEventReceiver {
+public class GameClientController implements ClientNetworkEventReceiver {
     private static GameClientController singleton;
 
     private GameClientController() {
@@ -90,23 +89,18 @@ public class GameClientController implements NetworkEventReceiver {
     }
 
     @Override
-    public void clientConnectionEvent(BasicServer s, BasicClient c) {
-
-    }
-
-    @Override
     public void dataReceivedEvent(BasicClient c) {
-
+        System.out.println("Client::dataReceivedEvent");
     }
 
     @Override
     public void disconnectEvent(BasicClient c) {
-
+        System.out.println("Client::disconnectEvent");
     }
 
     @Override
     public void endOfStreamEvent(BasicClient c) {
-
+        System.out.println("Client::endOfStreamEvent");
     }
 
     public enum NetworkInstantiationResult {

@@ -3,13 +3,7 @@ package net;
 /**
  * Receiver for Server/Client events
  */
-public interface NetworkEventReceiver {
-    /**
-     * Runs when a client connects to the server (called by ModifiedServer)
-     * @param s
-     * @param c
-     */
-    void clientConnectionEvent(BasicServer s, BasicClient c);
+public interface ClientNetworkEventReceiver {
 
     /**
      * Runs when a client has received data from the server (called by ModifiedClient)

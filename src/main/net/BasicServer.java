@@ -8,7 +8,7 @@ import java.util.ArrayList;
  * Processing's Server class modified to not use PApplet
  */
 public class BasicServer implements Runnable {
-    private final ArrayList<NetworkEventReceiver> networkEventReceivers = new ArrayList<>(1);
+    private final ArrayList<ServerNetworkEventReceiver> networkEventReceivers = new ArrayList<>(1);
     private volatile Thread thread;
     private ServerSocket server;
     private final Object clientsLock = new Object[0];
@@ -23,11 +23,11 @@ public class BasicServer implements Runnable {
         thread.start();
     }
 
-    public void addNetworkEventReceiver(NetworkEventReceiver networkEventReceiver) {
+    public void addNetworkEventReceiver(ServerNetworkEventReceiver networkEventReceiver) {
         networkEventReceivers.add(networkEventReceiver);
     }
 
-    public void removeNetworkEventReceiver(NetworkEventReceiver networkEventReceiver) {
+    public void removeNetworkEventReceiver(ServerNetworkEventReceiver networkEventReceiver) {
         networkEventReceivers.remove(networkEventReceiver);
     }
 
@@ -167,11 +167,9 @@ public class BasicServer implements Runnable {
             try {
                 Socket socket = server.accept();
                 BasicClient client = new BasicClient(socket);
-                for(NetworkEventReceiver networkEventReceiver : networkEventReceivers)
-                    client.addNetworkEventReceiver(networkEventReceiver);
                 synchronized (clientsLock) {
                     addClient(client);
-                    for(NetworkEventReceiver networkEventReceiver : networkEventReceivers)
+                    for(ServerNetworkEventReceiver networkEventReceiver : networkEventReceivers)
                         networkEventReceiver.clientConnectionEvent(this, client);
                 }
             } catch (SocketException e) {
