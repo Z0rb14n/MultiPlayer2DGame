@@ -13,7 +13,8 @@ import java.awt.*;
 public class BallObject extends GameObject {
     public static int BALL_COLLISION_MASK = 0b01;
     public static int BALL_ANTI_COLLISION_MASK = 0b10;
-    public BallObject(PhysicsEngine engine, SceneHierarchyNode node, Vec2D position, Vec2D velocity) {
+    private final int id;
+    public BallObject(PhysicsEngine engine, SceneHierarchyNode node, Vec2D position, Vec2D velocity, int id) {
         super(position);
         Circle circle = new Circle(Vec2D.ZERO,2);
         PhysicsBehaviour behaviour = new PhysicsBehaviour(this, engine, circle, false);
@@ -25,5 +26,10 @@ public class BallObject extends GameObject {
         addBehaviour(ballBehaviour);
         CircleRenderer renderer = new CircleRenderer(this, Color.MAGENTA, false);
         addBehaviour(renderer);
+        this.id = id;
+    }
+
+    public int getId() {
+        return id;
     }
 }

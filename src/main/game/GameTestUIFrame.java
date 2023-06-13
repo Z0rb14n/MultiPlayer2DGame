@@ -45,7 +45,7 @@ class GameTestUIFrame extends JFrame {
         MainPanel() {
             super();
             setBackground(Color.WHITE);
-            player = controller.addVehicle(new Vec2D(100,100));
+            player = controller.addVehicle(new Vec2D(100,100), 0);
         }
 
         void update() {
@@ -66,7 +66,7 @@ class GameTestUIFrame extends JFrame {
             //noinspection SwitchStatementWithTooFewBranches
             switch (pop) {
                 case CREATE_BALL:
-                    controller.createBall(player);
+                    controller.createBall(player, 0);
                     break;
                 default:
                     break;

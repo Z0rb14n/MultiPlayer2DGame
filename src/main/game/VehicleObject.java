@@ -18,7 +18,8 @@ public class VehicleObject extends GameObject {
         vertices[1] = new Vec2D(10,10);
         vertices[2] = new Vec2D(0,-10);
     }
-    public VehicleObject(PhysicsEngine engine, Vec2D position) {
+    private final int id;
+    public VehicleObject(PhysicsEngine engine, Vec2D position, int id) {
         super(position);
         triangle = new RotatedTriangle(vertices);
         behaviour = new PhysicsBehaviour(this,engine,triangle,false);
@@ -26,6 +27,7 @@ public class VehicleObject extends GameObject {
         addBehaviour(behaviour);
         RotatedTriangleRenderer renderer = new RotatedTriangleRenderer(this, Color.RED, true);
         addBehaviour(renderer);
+        this.id = id;
     }
 
     public void rotate(float angle) {
@@ -49,5 +51,9 @@ public class VehicleObject extends GameObject {
         if (behaviour.getVelocity().sqMag() > maxSpeed * maxSpeed) {
             behaviour.setVelocity(behaviour.getVelocity().scaleTo(maxSpeed));
         }
+    }
+
+    public int getId() {
+        return id;
     }
 }

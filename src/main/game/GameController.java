@@ -1,6 +1,7 @@
 package game;
 
 import engine.*;
+import game.net.GameStatePacket;
 import physics.*;
 import physics.broad.SpatialGrid;
 import physics.shape.AxisAlignedBoundingBox;
@@ -17,7 +18,7 @@ public class GameController {
     public static final int GAME_WIDTH = 800;
     public static final int GAME_HEIGHT = 400;
     private final PhysicsEngine engine;
-    private final ArrayList<GameObject> vehicles = new ArrayList<>();
+    private final ArrayList<VehicleObject> vehicles = new ArrayList<>();
     private final ArrayList<BallObject> balls = new ArrayList<>();
     private final SceneHierarchy hierarchy = new SceneHierarchy();
     private static int GAME_SPEED = 3;
@@ -33,8 +34,8 @@ public class GameController {
         createBoundingBoxes();
     }
 
-    public VehicleObject addVehicle(Vec2D pos) {
-        VehicleObject v = new VehicleObject(engine, pos);
+    public VehicleObject addVehicle(Vec2D pos, int id) {
+        VehicleObject v = new VehicleObject(engine, pos, id);
         hierarchy.addObject(v);
         vehicles.add(v);
         return v;
@@ -61,12 +62,12 @@ public class GameController {
 
     }
 
-    public void createBall(VehicleObject object) {
+    public void createBall(VehicleObject object, int id) {
         PhysicsBehaviour playerBehaviour = object.getBehaviour(PhysicsBehaviour.class);
         Vec2D playerPos = playerBehaviour.getPosition();
         Vec2D dir = Vec2D.UP.rotated(((RotatedTriangle)playerBehaviour.getShape()).getAngle());
         Vec2D ballPos = playerPos.add(dir.mult(10));
-        BallObject bo = new BallObject(engine, hierarchy.getRoot(), ballPos, dir.mult(350));
+        BallObject bo = new BallObject(engine, hierarchy.getRoot(), ballPos, dir.mult(350), id);
         balls.add(bo);
         hierarchy.addObject(bo);
     }
@@ -81,5 +82,9 @@ public class GameController {
 
     public void update() {
         engine.update(1/165f * GAME_SPEED);
+    }
+
+    public GameStatePacket asGameStatePacket() {
+        return new GameStatePacket(balls,vehicles);
     }
 }

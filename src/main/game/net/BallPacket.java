@@ -1,5 +1,7 @@
 package game.net;
 
+import engine.PhysicsBehaviour;
+import game.BallObject;
 import net.ByteSerializable;
 import net.ByteSerializableFactory;
 import net.MagicConstDeserializer;
@@ -13,6 +15,13 @@ public class BallPacket implements ByteSerializable {
     private final Vec2D position;
     private final Vec2D velocity;
     private final int id;
+
+    public BallPacket(BallObject object) {
+        PhysicsBehaviour physics = object.getBehaviour(PhysicsBehaviour.class);
+        this.position = object.getPosition();
+        this.velocity = physics.getVelocity();
+        this.id = object.getId();
+    }
 
     public BallPacket(Vec2D position, Vec2D velocity, int id) {
         this.position = position;
@@ -41,7 +50,7 @@ public class BallPacket implements ByteSerializable {
         return bytes;
     }
 
-    private static class BallPacketFactory implements ByteSerializableFactory<BallPacket> {
+    static class BallPacketFactory implements ByteSerializableFactory<BallPacket> {
         @Override
         public BallPacket deserialize(byte[] data, int index) {
             Vec2D position = new Vec2D(ByteSerializable.readFloat(index, data), ByteSerializable.readFloat(index + 4, data));

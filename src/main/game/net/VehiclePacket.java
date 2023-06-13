@@ -1,9 +1,12 @@
 package game.net;
 
+import engine.PhysicsBehaviour;
+import game.VehicleObject;
 import net.ByteSerializable;
 import net.ByteSerializableFactory;
 import net.MagicConstDeserializer;
 import physics.Vec2D;
+import physics.shape.RotatedTriangle;
 
 public class VehiclePacket implements ByteSerializable {
     static final int MAGIC_NUMBER = 0xAAAA6969;
@@ -14,6 +17,14 @@ public class VehiclePacket implements ByteSerializable {
     private final Vec2D velocity;
     private final int id;
     private final float angle;
+
+    public VehiclePacket(VehicleObject object) {
+        PhysicsBehaviour physics = object.getBehaviour(PhysicsBehaviour.class);
+        this.position = object.getPosition();
+        this.velocity = physics.getVelocity();
+        this.id = object.getId();
+        this.angle = ((RotatedTriangle) physics.getTranslatedShape()).getAngle();
+    }
 
     public VehiclePacket(Vec2D position, Vec2D velocity, int id, float angle) {
         this.position = position;
@@ -45,7 +56,7 @@ public class VehiclePacket implements ByteSerializable {
         return bytes;
     }
 
-    private static class VehiclePacketFactory implements ByteSerializableFactory<VehiclePacket> {
+    static class VehiclePacketFactory implements ByteSerializableFactory<VehiclePacket> {
         @Override
         public VehiclePacket deserialize(byte[] data, int index) {
             Vec2D position = new Vec2D(ByteSerializable.readFloat(index, data), ByteSerializable.readFloat(index + 4, data));

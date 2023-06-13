@@ -36,5 +36,6 @@ public class GameServer implements ServerNetworkEventReceiver {
 
     public void update() {
         controller.update();
+        server.writePacket(controller.asGameStatePacket());
     }
 }
