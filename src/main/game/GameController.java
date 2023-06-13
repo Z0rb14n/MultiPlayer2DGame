@@ -74,7 +74,6 @@ public class GameController {
 
     public void render(Graphics2D g) {
         Time.deltaTime = (System.nanoTime() - Time.lastRenderNano) / 1000000000f;
-        hierarchy.update();
         hierarchy.render(g);
         engine.getBroadphaseStructure().render(g, Color.BLACK);
         Time.lastRenderNano = System.nanoTime();
@@ -82,6 +81,7 @@ public class GameController {
 
     public void update() {
         engine.update(1/165f * GAME_SPEED);
+        hierarchy.update();
     }
 
     public GameStatePacket asGameStatePacket() {

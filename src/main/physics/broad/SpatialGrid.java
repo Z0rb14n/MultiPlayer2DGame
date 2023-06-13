@@ -13,6 +13,7 @@ import java.util.HashSet;
 public class SpatialGrid<T> implements BroadphaseStructure<T> {
     private final Vec2D cellSize;
     private final HashMap<Pair<Integer,Integer>, ArrayList<T>> cells = new HashMap<>();
+    private final HashMap<T, ArrayList<Pair<Integer, Integer>>> objectToCells = new HashMap<>();
 
     public SpatialGrid(Vec2D cellSize) {
         this.cellSize = cellSize;
@@ -41,12 +42,16 @@ public class SpatialGrid<T> implements BroadphaseStructure<T> {
                 cells.put(location, new ArrayList<>());
             }
             cells.get(location).add(object);
+            if (!objectToCells.containsKey(object)) {
+                objectToCells.put(object, new ArrayList<>());
+            }
+            objectToCells.get(object).add(location);
         }
     }
 
     @Override
     public void remove(T object, ConvexShape shape) {
-        ArrayList<Pair<Integer, Integer>> locations = getRelevantCellLocations(shape);
+        ArrayList<Pair<Integer, Integer>> locations = objectToCells.get(object);
         for (Pair<Integer, Integer> location : locations) {
             ArrayList<T> objects = cells.get(location);
             if (objects != null) {
@@ -56,6 +61,7 @@ public class SpatialGrid<T> implements BroadphaseStructure<T> {
                 }
             }
         }
+        objectToCells.remove(object);
     }
 
     @Override
