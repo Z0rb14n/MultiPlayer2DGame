@@ -1,5 +1,7 @@
 package game;
 
+import physics.Vec2D;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -39,9 +41,11 @@ class GameTestUIFrame extends JFrame {
 
     static class MainPanel extends JPanel implements KeyListener {
         private final GameController controller = GameController.getInstance();
+        private final VehicleObject player;
         MainPanel() {
             super();
             setBackground(Color.WHITE);
+            player = controller.addVehicle(new Vec2D(100,100));
         }
 
         void update() {
@@ -62,7 +66,7 @@ class GameTestUIFrame extends JFrame {
             //noinspection SwitchStatementWithTooFewBranches
             switch (pop) {
                 case CREATE_BALL:
-                    controller.createBall((VehicleObject) controller.getPlayer());
+                    controller.createBall(player);
                     break;
                 default:
                     break;
@@ -78,23 +82,22 @@ class GameTestUIFrame extends JFrame {
         private void handleInputs() {
             float forceAmount = 0.2f;
             float force = 0;
-            VehicleObject object = (VehicleObject) controller.getPlayer();
 
             if (pressedKeyCodes.contains(KeyEvent.VK_W)) {
                 force -= forceAmount;
             }
             if (pressedKeyCodes.contains(KeyEvent.VK_A)) {
                 //force = force.add(new Vec2D(-forceAmount,0));
-                object.rotate(-0.03f);
+                player.rotate(-0.03f);
             }
             if (pressedKeyCodes.contains(KeyEvent.VK_S)) {
                 force += forceAmount;
             }
             if (pressedKeyCodes.contains(KeyEvent.VK_D)) {
                 //force = force.add(new Vec2D(forceAmount,0));
-                object.rotate(0.03f);
+                player.rotate(0.03f);
             }
-            object.accelerate(force);
+            player.accelerate(force);
         }
 
         private final HashSet<Integer> pressedKeyCodes = new HashSet<>(15);

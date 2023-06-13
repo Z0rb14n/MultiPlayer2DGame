@@ -20,7 +20,6 @@ public class GameController {
     private final ArrayList<GameObject> vehicles = new ArrayList<>();
     private final ArrayList<BallObject> balls = new ArrayList<>();
     private final SceneHierarchy hierarchy = new SceneHierarchy();
-    private GameObject player;
     private static int GAME_SPEED = 3;
     private static GameController singleton;
     public static GameController getInstance() {
@@ -32,12 +31,10 @@ public class GameController {
         //engine = new PhysicsEngine(new Vec2D(GAME_WIDTH+100, GAME_HEIGHT+100), new Vec2D(-50,-50));
         engine = new PhysicsEngine(new SpatialGrid<>(new Vec2D(50,50)));
         createBoundingBoxes();
-        // create test vehicle
-        player = addVehicle(new Vec2D(100,100));
     }
 
-    public GameObject addVehicle(Vec2D pos) {
-        GameObject v = new VehicleObject(engine, pos);
+    public VehicleObject addVehicle(Vec2D pos) {
+        VehicleObject v = new VehicleObject(engine, pos);
         hierarchy.addObject(v);
         vehicles.add(v);
         return v;
@@ -72,10 +69,6 @@ public class GameController {
         BallObject bo = new BallObject(engine, hierarchy.getRoot(), ballPos, dir.mult(350));
         balls.add(bo);
         hierarchy.addObject(bo);
-    }
-
-    public GameObject getPlayer() {
-        return player;
     }
 
     public void render(Graphics2D g) {
