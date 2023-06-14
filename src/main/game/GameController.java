@@ -2,6 +2,7 @@ package game;
 
 import engine.*;
 import game.net.GameStatePacket;
+import game.net.VehiclePacket;
 import physics.*;
 import physics.broad.SpatialGrid;
 import physics.shape.AxisAlignedBoundingBox;
@@ -9,6 +10,7 @@ import physics.shape.RotatedTriangle;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Represents the game controller
@@ -18,7 +20,7 @@ public class GameController {
     public static final int GAME_WIDTH = 800;
     public static final int GAME_HEIGHT = 400;
     private final PhysicsEngine engine;
-    private final ArrayList<VehicleObject> vehicles = new ArrayList<>();
+    private final HashMap<Integer, VehicleObject> vehicles = new HashMap<>();
     private final ArrayList<BallObject> balls = new ArrayList<>();
     private final SceneHierarchy hierarchy = new SceneHierarchy();
     private static int GAME_SPEED = 3;
@@ -37,7 +39,17 @@ public class GameController {
     public VehicleObject addVehicle(Vec2D pos, int id) {
         VehicleObject v = new VehicleObject(engine, pos, id);
         hierarchy.addObject(v);
-        vehicles.add(v);
+        vehicles.put(id,v);
+        return v;
+    }
+
+    public VehicleObject addVehicle(Vec2D pos, int id, Vec2D vel, float angle) {
+        VehicleObject v = new VehicleObject(engine, pos, id, angle);
+        // set velocity
+        PhysicsBehaviour behaviour = v.getBehaviour(PhysicsBehaviour.class);
+        behaviour.setVelocity(vel);
+        hierarchy.addObject(v);
+        vehicles.put(id, v);
         return v;
     }
 
@@ -84,7 +96,41 @@ public class GameController {
         hierarchy.update();
     }
 
+    public void updateFromPacket(GameStatePacket packet) {
+        if (packet.vehicles.length != vehicles.size()) {
+            // delete all vehicles
+            for (VehicleObject vehicle : vehicles.values()) {
+                hierarchy.removeObject(vehicle);
+            }
+            vehicles.clear();
+            // create new vehicles
+            for (int i = 0; i < packet.vehicles.length; i++) {
+                addVehicle(packet.vehicles[i].getPosition(), packet.vehicles[i].getId(), packet.vehicles[i].getVelocity(), packet.vehicles[i].getAngle());
+            }
+        } else {
+            for (VehiclePacket vehiclePacket : packet.vehicles) {
+                VehicleObject vehicle = vehicles.get(vehiclePacket.getId());
+                vehicle.setPosition(vehiclePacket.getPosition());
+                vehicle.setAngle(vehiclePacket.getAngle());
+                PhysicsBehaviour behaviour = vehicle.getBehaviour(PhysicsBehaviour.class);
+                behaviour.setVelocity(vehiclePacket.getVelocity());
+            }
+        }
+
+        // delete all balls
+        for (BallObject ball : balls) {
+            hierarchy.removeObject(ball);
+        }
+        balls.clear();
+        // create new balls
+        for (int i = 0; i < packet.balls.length; i++) {
+            BallObject bo = new BallObject(engine, hierarchy.getRoot(), packet.balls[i].getPosition(), packet.balls[i].getVelocity(), packet.balls[i].getId(), packet.balls[i].getBounceCount());
+            balls.add(bo);
+            hierarchy.addObject(bo);
+        }
+    }
+
     public GameStatePacket asGameStatePacket() {
-        return new GameStatePacket(balls,vehicles);
+        return new GameStatePacket(balls.toArray(new BallObject[0]),vehicles.values().toArray(new VehicleObject[0]));
     }
 }

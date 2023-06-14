@@ -2,7 +2,12 @@ package net;
 
 import java.nio.ByteBuffer;
 
-// of format [length][sublength][magic][data][sublength][magic][data]...
+/**
+ * A ByteSerializableArray is a ByteSerializable that contains an array of ByteSerializables.
+ *
+ * The format of the data is as follows:
+ * [length][sublength][magic][data][sublength][magic][data]...
+ */
 public class ByteSerializableArray implements ByteSerializable {
     static {
         MagicConstDeserializer.registerFactory(ByteSerializableArray.MAGIC_NUMBER, new ByteSerializableArrayFactory());
@@ -39,14 +44,21 @@ public class ByteSerializableArray implements ByteSerializable {
         return buffer.array();
     }
 
-    public static ByteSerializableArray deserialize(byte[] data, int offset) {
+    public static ByteSerializableArray deserialize(byte[] data, int offset, int len) {
+        if (len < 4) return null;
         int length = ByteSerializable.readInt(offset, data);
+        int totalUsed = 4;
         offset += 4;
         ByteSerializable[] array = new ByteSerializable[length];
         for (int i = 0; i < length; i++) {
+            if (totalUsed+4 > len) return null;
             int sublength = ByteSerializable.readInt(offset, data);
             offset += 4;
-            array[i] = MagicConstDeserializer.deserialize(data, offset); // sublength might be useful
+            totalUsed +=4;
+            if (totalUsed+ sublength+4 > len) return null;
+            totalUsed += sublength + 4;
+            array[i] = MagicConstDeserializer.deserialize(data, offset, sublength);
+            if (array[i] == null) return null;
             offset += sublength + 4;
         }
         return new ByteSerializableArray(array);
@@ -54,8 +66,8 @@ public class ByteSerializableArray implements ByteSerializable {
 
     private static class ByteSerializableArrayFactory implements ByteSerializableFactory<ByteSerializableArray> {
         @Override
-        public ByteSerializableArray deserialize(byte[] data, int offset) {
-            return ByteSerializableArray.deserialize(data, offset);
+        public ByteSerializableArray deserialize(byte[] data, int offset, int len) {
+            return ByteSerializableArray.deserialize(data, offset, len);
         }
     }
 }

@@ -14,6 +14,23 @@ public class BallPacket implements ByteSerializable {
         MagicConstDeserializer.registerFactory(BallPacket.MAGIC_NUMBER, new BallPacketFactory());
     }
     private final Vec2D position;
+
+    public Vec2D getPosition() {
+        return position;
+    }
+
+    public Vec2D getVelocity() {
+        return velocity;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public int getBounceCount() {
+        return bounceCount;
+    }
+
     private final Vec2D velocity;
     private final int id;
     private final int bounceCount;
@@ -58,7 +75,8 @@ public class BallPacket implements ByteSerializable {
 
     static class BallPacketFactory implements ByteSerializableFactory<BallPacket> {
         @Override
-        public BallPacket deserialize(byte[] data, int index) {
+        public BallPacket deserialize(byte[] data, int index, int len) {
+            if (len < PACKET_LEN) return null;
             Vec2D position = new Vec2D(ByteSerializable.readFloat(index, data), ByteSerializable.readFloat(index + 4, data));
             Vec2D velocity = new Vec2D(ByteSerializable.readFloat(index + 8, data), ByteSerializable.readFloat(index + 12, data));
             int id = ByteSerializable.readInt(index + 16, data);

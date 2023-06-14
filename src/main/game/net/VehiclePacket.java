@@ -10,10 +10,12 @@ import physics.shape.RotatedTriangle;
 
 public class VehiclePacket implements ByteSerializable {
     static final int MAGIC_NUMBER = 0xAAAA6969;
+    static final int PACKET_LEN = 24;
     static {
         MagicConstDeserializer.registerFactory(VehiclePacket.MAGIC_NUMBER, new VehiclePacket.VehiclePacketFactory());
     }
     private final Vec2D position;
+
     private final Vec2D velocity;
     private final int id;
     private final float angle;
@@ -38,9 +40,25 @@ public class VehiclePacket implements ByteSerializable {
         return MAGIC_NUMBER;
     }
 
+    public Vec2D getPosition() {
+        return position;
+    }
+
+    public Vec2D getVelocity() {
+        return velocity;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public float getAngle() {
+        return angle;
+    }
+
     @Override
     public byte[] toByteArray() {
-        byte[] bytes = new byte[20];
+        byte[] bytes = new byte[PACKET_LEN];
         int index = 0;
         ByteSerializable.writeFloat(position.getX(), bytes, index);
         index += 4;
@@ -58,7 +76,8 @@ public class VehiclePacket implements ByteSerializable {
 
     static class VehiclePacketFactory implements ByteSerializableFactory<VehiclePacket> {
         @Override
-        public VehiclePacket deserialize(byte[] data, int index) {
+        public VehiclePacket deserialize(byte[] data, int index, int len) {
+            if (len < PACKET_LEN) return null;
             Vec2D position = new Vec2D(ByteSerializable.readFloat(index, data), ByteSerializable.readFloat(index + 4, data));
             Vec2D velocity = new Vec2D(ByteSerializable.readFloat(index + 8, data), ByteSerializable.readFloat(index + 12, data));
             int id = ByteSerializable.readInt(index + 16, data);

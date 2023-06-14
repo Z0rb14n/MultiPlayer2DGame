@@ -7,12 +7,12 @@ public class MagicConstDeserializer {
     public static void registerFactory(int magic, ByteSerializableFactory<?> factory) {
         factories.put(magic, factory);
     }
-    public static ByteSerializable deserialize(byte[] data, int offset) {
-        assert data.length >= offset + 4;
+    public static ByteSerializable deserialize(byte[] data, int offset, int len) {
+        if (len < 4) return null;
         int magic = ByteSerializable.readInt(offset, data);
         ByteSerializableFactory<?> factory = factories.get(magic);
         if (factory != null) {
-            return factory.deserialize(data, offset + 4);
+            return factory.deserialize(data, offset + 4, len);
         }
         return null;
     }

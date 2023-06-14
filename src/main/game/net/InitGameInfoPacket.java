@@ -52,11 +52,13 @@ public class InitGameInfoPacket implements ByteSerializable {
 
     public static class InitGameInfoPacketFactory implements ByteSerializableFactory<InitGameInfoPacket> {
         @Override
-        public InitGameInfoPacket deserialize(byte[] data, int index) {
+        public InitGameInfoPacket deserialize(byte[] data, int index, int len) {
+            if (len < 8) return null;
             int yourPlayerID = ByteSerializable.readInt(index, data);
             index += 4;
             int numPlayers = ByteSerializable.readInt(index, data);
             index += 4;
+            if (len < 8 + 4 * numPlayers) return null;
             int[] activePlayers = new int[numPlayers];
             for (int i = 0; i < numPlayers; i++) {
                 activePlayers[i] = ByteSerializable.readInt(index, data);

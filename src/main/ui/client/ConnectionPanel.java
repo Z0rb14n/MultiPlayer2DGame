@@ -65,7 +65,7 @@ class ConnectionPanel extends JPanel {
                 GameLogger.getDefault().log("Successful connection. Player num: " + GameClientController.getInstance().getPlayerNumber());
                 updateErrorDisplayed("");
                 setVisible(false);
-                // TODO TELL MAIN FRAME TO SWITCH TO GAME PANEL
+                GameFrame.getInstance().startGame();
                 break;
             case TIMEOUT:
                 GameLogger.getDefault().log("Connection timed out.");

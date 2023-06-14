@@ -1,6 +1,7 @@
 package ui.client;
 
 import game.GameController;
+import game.net.GameStatePacket;
 
 import javax.swing.*;
 import java.awt.*;
@@ -15,14 +16,35 @@ public class GameFrame extends JFrame {
         return singleton;
     }
 
+    private final ConnectionPanel cp;
+    private final GamePanel gp;
+
     private GameFrame() {
         super("don't sue");
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setSize(SIZE);
         setPreferredSize(SIZE);
-        ConnectionPanel cp = new ConnectionPanel();
+        cp = new ConnectionPanel();
+        gp = new GamePanel();
         add(cp);
         setVisible(true);
+    }
+
+    public void startGame() {
+        remove(cp);
+        add(gp);
+        gp.requestFocus();
+        repaint();
+    }
+
+    public void endGame() {
+        remove(gp);
+        add(cp);
+        repaint();
+    }
+
+    public void updatePacket(GameStatePacket packet) {
+        gp.update(packet);
     }
 
     public static void main(String[] args) {

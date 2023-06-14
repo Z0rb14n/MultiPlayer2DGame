@@ -426,7 +426,7 @@ public class BasicClient implements Runnable {
                 bufferLast = 0;
             }
 
-            return MagicConstDeserializer.deserialize(buffer, bufferIndex+4);
+            return MagicConstDeserializer.deserialize(buffer, bufferIndex+4, length-4);
         }
     }
 

@@ -20,8 +20,13 @@ public class VehicleObject extends GameObject {
     }
     private final int id;
     public VehicleObject(PhysicsEngine engine, Vec2D position, int id) {
+        this(engine, position, id, 0);
+    }
+
+    public VehicleObject(PhysicsEngine engine, Vec2D position, int id, float angle) {
         super(position);
         triangle = new RotatedTriangle(vertices);
+        triangle.setAngle(angle);
         behaviour = new PhysicsBehaviour(this,engine,triangle,false);
         behaviour.setCollisionMask(VEHICLE_COLLISION_MASK);
         addBehaviour(behaviour);
@@ -32,6 +37,11 @@ public class VehicleObject extends GameObject {
 
     public void rotate(float angle) {
         triangle.rotate(angle);
+        behaviour.setShape(triangle); // screws with the shape; reset it
+    }
+
+    public void setAngle(float angle) {
+        triangle.setAngle(angle);
         behaviour.setShape(triangle); // screws with the shape; reset it
     }
 

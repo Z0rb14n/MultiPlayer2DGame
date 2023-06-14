@@ -51,6 +51,11 @@ public class RotatedTriangle extends ConvexShape {
         computeVertices();
     }
 
+    public void setAngle(float angle) {
+        this.angle = angle;
+        computeVertices();
+    }
+
     @Override
     public Vec2D[] getVertices() {
         Vec2D[] vertices = new Vec2D[3];

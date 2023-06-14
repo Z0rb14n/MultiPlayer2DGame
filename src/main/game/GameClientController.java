@@ -1,10 +1,12 @@
 package game;
 
+import game.net.GameStatePacket;
 import game.net.InitGameInfoPacket;
 import game.net.NetworkConstants;
 import net.BasicClient;
 import net.ByteSerializable;
 import net.ClientNetworkEventReceiver;
+import ui.client.GameFrame;
 
 import java.io.IOException;
 import java.net.SocketException;
@@ -28,9 +30,9 @@ public class GameClientController implements ClientNetworkEventReceiver {
         try {
             GameLogger.getDefault().log("Starting instantiation of client...", "NETWORK");
             client = new BasicClient(ip, NetworkConstants.PORT, 5000);
-            client.addNetworkEventReceiver(this);
             GameLogger.getDefault().log("Client instantiated.", "NETWORK");
             InitGameInfoPacket.ensureFactoryInitialized();
+            GameStatePacket.registerFactory();
             ByteSerializable packet = spinReadPacket(500);
             if (packet == null) {
                 GameLogger.getDefault().log("Packet was null.", "NETWORK");
@@ -51,6 +53,7 @@ public class GameClientController implements ClientNetworkEventReceiver {
             for (int i = 0; i < initPacket.getActivePlayers().length; i++) {
                 currentPlayers.add(i);
             }
+            client.addNetworkEventReceiver(this);
             return NetworkInstantiationResult.SUCCESS;
         } catch (SocketException ex) {
             if (ex.getMessage().contains("already connected")) {
@@ -91,16 +94,40 @@ public class GameClientController implements ClientNetworkEventReceiver {
     @Override
     public void dataReceivedEvent(BasicClient c) {
         System.out.println("Client::dataReceivedEvent");
+        ByteSerializable packet = c.readPacket();
+        if (packet == null) return;
+        System.out.println("Packet received: " + packet);
+        if (packet instanceof GameStatePacket) {
+            GameStatePacket gameStatePacket = (GameStatePacket) packet;
+            GameController.getInstance().updateFromPacket(gameStatePacket);
+            GameFrame.getInstance().updatePacket(gameStatePacket);
+        }
     }
 
     @Override
     public void disconnectEvent(BasicClient c) {
         System.out.println("Client::disconnectEvent");
+        ArrayList<ByteSerializable> packets = new ArrayList<>();
+        ByteSerializable packet;
+        while ((packet = c.readPacket()) != null) {
+            packets.add(packet);
+        }
+        System.out.println("Packets received on disconnect: " + packets.size());
+
+        for (ByteSerializable p : packets) {
+            if (p instanceof GameStatePacket) {
+                GameStatePacket gameStatePacket = (GameStatePacket) p;
+                GameController.getInstance().updateFromPacket(gameStatePacket);
+                GameFrame.getInstance().updatePacket(gameStatePacket);
+            }
+        }
+        GameFrame.getInstance().endGame();
     }
 
     @Override
     public void endOfStreamEvent(BasicClient c) {
         System.out.println("Client::endOfStreamEvent");
+        GameFrame.getInstance().endGame();
     }
 
     public enum NetworkInstantiationResult {

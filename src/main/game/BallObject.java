@@ -13,8 +13,12 @@ public class BallObject extends GameObject implements GameObjectBehaviour {
     public static int BALL_MAX_BOUNCES = 5;
     private final int id;
     private final SceneHierarchyNode parent;
-    private int counter = 0;
+    private int counter;
     public BallObject(PhysicsEngine engine, SceneHierarchyNode node, Vec2D position, Vec2D velocity, int id) {
+        this(engine, node, position, velocity, id, 0);
+    }
+
+    public BallObject(PhysicsEngine engine, SceneHierarchyNode node, Vec2D position, Vec2D velocity, int id, int bounceCount) {
         super(position);
         Circle circle = new Circle(Vec2D.ZERO,2);
         PhysicsBehaviour behaviour = new PhysicsBehaviour(this, engine, circle, false);
@@ -27,6 +31,7 @@ public class BallObject extends GameObject implements GameObjectBehaviour {
         CircleRenderer renderer = new CircleRenderer(this, Color.MAGENTA, false);
         addBehaviour(renderer);
         this.id = id;
+        this.counter = bounceCount;
     }
 
     public int getId() {
