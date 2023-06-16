@@ -23,7 +23,7 @@ public class GameLogger {
         typeLevels.put("INPUT", Level.WARNING);
         typeLevels.put("RENDER", Level.WARNING);
         typeLevels.put("GAME", Level.WARNING);
-        typeLevels.put("NETWORK", Level.WARNING);
+        typeLevels.put("NETWORK", Level.IGNORE);
         typeLevels.put("AUDIO", Level.WARNING);
         typeLevels.put("UI", Level.WARNING);
         typeLevels.put("DEBUG", Level.INFO);

@@ -7,7 +7,7 @@ import net.ByteSerializableFactory;
 import net.MagicConstDeserializer;
 
 import java.io.ByteArrayOutputStream;
-import java.util.ArrayList;
+import java.nio.ByteBuffer;
 import java.util.Collection;
 
 public class GameStatePacket implements ByteSerializable {
@@ -54,11 +54,12 @@ public class GameStatePacket implements ByteSerializable {
     @Override
     public byte[] toByteArray() {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        baos.write(balls.length);
+        // use byte buffer to wrap
+        baos.write(ByteBuffer.allocate(4).putInt(balls.length).array(),0,4);
         for (BallPacket ball : balls) {
             baos.write(ball.toByteArray(), 0, BallPacket.PACKET_LEN);
         }
-        baos.write(vehicles.length);
+        baos.write(ByteBuffer.allocate(4).putInt(vehicles.length).array(),0,4);
         for (VehiclePacket vehicle : vehicles) {
             baos.write(vehicle.toByteArray(), 0, VehiclePacket.PACKET_LEN);
         }

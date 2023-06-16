@@ -93,10 +93,10 @@ public class GameClientController implements ClientNetworkEventReceiver {
 
     @Override
     public void dataReceivedEvent(BasicClient c) {
-        System.out.println("Client::dataReceivedEvent");
+        GameLogger.getDefault().log("Client::dataReceivedEvent", "NETWORK");
         ByteSerializable packet = c.readPacket();
         if (packet == null) return;
-        System.out.println("Packet received: " + packet);
+        GameLogger.getDefault().log("Packet received: " + packet, "NETWORK");
         if (packet instanceof GameStatePacket) {
             GameStatePacket gameStatePacket = (GameStatePacket) packet;
             GameController.getInstance().updateFromPacket(gameStatePacket);
