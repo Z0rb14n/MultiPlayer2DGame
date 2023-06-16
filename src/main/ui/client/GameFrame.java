@@ -34,6 +34,7 @@ public class GameFrame extends JFrame {
         remove(cp);
         add(gp);
         gp.requestFocus();
+        gp.signalGameStart();
         repaint();
     }
 

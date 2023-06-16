@@ -3,35 +3,28 @@ package util;
 import java.util.Objects;
 
 public class Pair<FirstClass, SecondClass> {
-    private FirstClass a;
-    private SecondClass b;
+    public final FirstClass first;
+    public final SecondClass second;
 
-    public Pair(FirstClass a, SecondClass b) {
-        set(a, b);
+    public Pair(FirstClass first, SecondClass b) {
+        this.first = first;
+        this.second = b;
     }
-
-    public void set(FirstClass a, SecondClass b) {
-        this.a = a;
-        this.b = b;
-    }
-
-    public FirstClass getFirst() { return a; }
-    public SecondClass getSecond() { return b; }
 
     @Override
     public String toString() {
-        return "(" + a + ", " + b + ")";
+        return "(" + first + ", " + second + ")";
     }
 
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof Pair)) return false;
         Pair<?,?> p = (Pair<?,?>) o;
-        return a.equals(p.a) && b.equals(p.b);
+        return first.equals(p.first) && second.equals(p.second);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(a,b);
+        return Objects.hash(first, second);
     }
 }

@@ -2,6 +2,7 @@ package net;
 
 import game.net.BallPacket;
 import game.net.GameStatePacket;
+import game.net.InputPacket;
 import game.net.VehiclePacket;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -127,6 +128,27 @@ public class TestObjectServerIO {
         assertGamePacketEquals(packet, readPacket2);
         assertGamePacketEquals(packet, readPacket3);
         assertEquals(0, client.available());
+    }
+
+    @Test
+    public void testSendInputPacket() {
+        // create and send 3 input packets
+        InputPacket[] packets = new InputPacket[3];
+        for (int i = 0; i < 3; i++) {
+            packets[i] = InputPacket.EMPTY;
+            server.writePacket(packets[i]);
+        }
+        // read 3 input packets
+        for (int i = 0; i < 3; i++) {
+            InputPacket readPacket = (InputPacket) client.readPacket();
+            assertInputPacketEquals(packets[i], readPacket);
+        }
+    }
+
+    private static void assertInputPacketEquals(InputPacket packet, InputPacket readPacket) {
+        // two array equals
+        assertArrayEquals(packet.getInput(), readPacket.getInput());
+        assertArrayEquals(packet.getPressed(), readPacket.getPressed());
     }
 
     private static void assertBallPacketEquals(BallPacket p1, BallPacket p2) {

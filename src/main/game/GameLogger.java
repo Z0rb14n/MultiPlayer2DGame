@@ -35,14 +35,6 @@ public class GameLogger {
     public GameLogger() {
     }
 
-    public Level getDefaultLevel() {
-        return defaultLevel;
-    }
-
-    public void setDefaultLevel(Level level) {
-        defaultLevel = level;
-    }
-
     public void setLevel(String tag, Level level) {
         typeLevels.put(tag, level);
     }

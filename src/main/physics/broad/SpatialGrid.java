@@ -92,7 +92,7 @@ public class SpatialGrid<T> implements BroadphaseStructure<T> {
     public void render(Graphics2D g, Color color) {
         g.setColor(color);
         for(Pair<Integer,Integer> pos : cells.keySet()) {
-            g.drawRect(pos.getFirst() * (int)cellSize.getX(), pos.getSecond() * (int)cellSize.getY(), (int)cellSize.getX(), (int)cellSize.getY());
+            g.drawRect(pos.first * (int)cellSize.getX(), pos.second * (int)cellSize.getY(), (int)cellSize.getX(), (int)cellSize.getY());
         }
     }
 }

@@ -61,7 +61,7 @@ public class PhysicsEngine {
             }
         }
         for(Pair<PhysicsBehaviour,ConvexShape> object : objectUpdateQueue) {
-            broadphaseStructure.update(object.getFirst(), object.getSecond(), object.getFirst().getTranslatedShape());
+            broadphaseStructure.update(object.first, object.second, object.first.getTranslatedShape());
         }
         objectUpdateQueue.clear();
         updateColStep();

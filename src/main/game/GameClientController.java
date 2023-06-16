@@ -75,6 +75,10 @@ public class GameClientController implements ClientNetworkEventReceiver {
         return playerNumber;
     }
 
+    public VehicleObject getVehicleObject() {
+        return GameController.getInstance().getVehicle(playerNumber);
+    }
+
     private ByteSerializable spinReadPacket(int retries) {
         return spinReadPacket(retries, 1);
     }
@@ -89,6 +93,10 @@ public class GameClientController implements ClientNetworkEventReceiver {
             }
         }
         return null;
+    }
+
+    public void sendPacket(ByteSerializable packet) {
+        client.writePacket(packet);
     }
 
     @Override

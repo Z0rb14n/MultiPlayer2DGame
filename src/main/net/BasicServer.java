@@ -52,6 +52,8 @@ public class BasicServer implements Runnable {
 
     private void removeIndex(int index) {
         synchronized (clientsLock) {
+            for (ServerNetworkEventReceiver networkEventReceiver : networkEventReceivers)
+                networkEventReceiver.removeClientEvent(this, clients.get(index));
             clients.remove(index);
         }
     }
@@ -63,6 +65,8 @@ public class BasicServer implements Runnable {
                     clients.get(0).stop();
                 } catch (Exception ignored) {
                 }
+                for (ServerNetworkEventReceiver networkEventReceiver : networkEventReceivers)
+                    networkEventReceiver.removeClientEvent(this, clients.get(0));
                 clients.remove(0);
             }
         }

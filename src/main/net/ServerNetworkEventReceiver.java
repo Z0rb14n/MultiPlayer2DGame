@@ -7,4 +7,6 @@ public interface ServerNetworkEventReceiver {
      * @param c
      */
     void clientConnectionEvent(BasicServer s, BasicClient c);
+
+    void removeClientEvent(BasicServer s, BasicClient c);
 }
