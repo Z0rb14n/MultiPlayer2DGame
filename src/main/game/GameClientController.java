@@ -107,7 +107,6 @@ public class GameClientController implements ClientNetworkEventReceiver {
         GameLogger.getDefault().log("Packet received: " + packet, "NETWORK");
         if (packet instanceof GameStatePacket) {
             GameStatePacket gameStatePacket = (GameStatePacket) packet;
-            GameController.getInstance().updateFromPacket(gameStatePacket);
             GameFrame.getInstance().updatePacket(gameStatePacket);
         }
     }

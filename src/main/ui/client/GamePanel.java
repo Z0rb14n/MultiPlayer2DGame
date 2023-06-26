@@ -18,6 +18,7 @@ public class GamePanel extends JPanel implements KeyListener {
     private final GameClientController clientController = GameClientController.getInstance();
     private final Timer timer = new Timer(Math.floorDiv(1000, 165), ae -> this.update());
     private final Object lock = new Object[0];
+    private final ArrayDeque<GameStatePacket> packetQueue = new ArrayDeque<>();
     public GamePanel() {
         super();
         setBackground(Color.WHITE);
@@ -29,29 +30,31 @@ public class GamePanel extends JPanel implements KeyListener {
     }
 
     void update() {
+        handleInputs();
+        long start = System.nanoTime();
+
         synchronized (lock) {
-            handleInputs();
+            while (packetQueue.size() > 0) {
+                controller.updateFromPacket(packetQueue.poll());
+            }
         }
+        long physUpdate = System.nanoTime();
+        GameLogger.getDefault().log("From Packet update took " + (physUpdate - start) / 1000000f + "ms","PERFORMANCE");
+        repaint();
+        long render = System.nanoTime();
+        GameLogger.getDefault().log("Render took " + (render - physUpdate) / 1000000f + "ms","PERFORMANCE");
     }
 
     void update(GameStatePacket packet) {
         synchronized (lock) {
-            long start = System.nanoTime();
-            controller.updateFromPacket(packet);
-            long physUpdate = System.nanoTime();
-            GameLogger.getDefault().log("From Packet update took " + (physUpdate - start) / 1000000f + "ms","PERFORMANCE");
-            repaint();
-            long render = System.nanoTime();
-            GameLogger.getDefault().log("Render took " + (render - physUpdate) / 1000000f + "ms","PERFORMANCE");
+            if (packet != null) packetQueue.add(packet);
         }
     }
 
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        synchronized (lock) {
-            controller.render((Graphics2D) g);
-        }
+        controller.render((Graphics2D) g);
     }
 
     private void handleInputs() {
@@ -69,7 +72,7 @@ public class GamePanel extends JPanel implements KeyListener {
             }
             GameClientController.getInstance().sendPacket(new InputPacket(inputs, isAdd));
         }
-        synchronized (lock) {
+        if (packetQueue.isEmpty()) {
             VehicleObject vehicleObject = clientController.getVehicleObject();
             if (vehicleObject == null) return;
             float forceAmount = 0.2f;
