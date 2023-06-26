@@ -48,6 +48,10 @@ public class PhysicsBehaviour implements GameObjectBehaviour {
         engine.remove(this);
     }
 
+    public GameObject getParentObject() {
+        return parent;
+    }
+
     public ConvexShape getShape() {
         return shape;
     }

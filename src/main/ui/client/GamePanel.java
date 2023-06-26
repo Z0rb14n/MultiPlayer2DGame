@@ -45,9 +45,16 @@ public class GamePanel extends JPanel implements KeyListener {
         GameLogger.getDefault().log("Render took " + (render - physUpdate) / 1000000f + "ms","PERFORMANCE");
     }
 
+    private long lastUpdate = 0;
+
     void update(GameStatePacket packet) {
         synchronized (lock) {
-            if (packet != null) packetQueue.add(packet);
+            if (packet != null) {
+                packetQueue.add(packet);
+                long diff = System.nanoTime() - lastUpdate;
+                GameLogger.getDefault().log("Packet diff: " + diff / 1000000f + "ms", "PERFORMANCE");
+                lastUpdate = System.nanoTime();
+            }
         }
     }
 

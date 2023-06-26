@@ -71,6 +71,8 @@ public class GameStatePacket implements ByteSerializable {
         public GameStatePacket deserialize(byte[] data, int index, int len) {
             if (len < 4) return null;
             int ballsLength = ByteSerializable.readInt(index, data);
+            if (ballsLength < 0) System.err.println("Invalid balls length: " + ballsLength);
+            if (ballsLength > 100) System.out.println("Prepare for Heap Space error: " + ballsLength);
             BallPacket[] balls = new BallPacket[ballsLength];
             index += 4;
             int remainingLen = len - 4;
@@ -82,6 +84,7 @@ public class GameStatePacket implements ByteSerializable {
             }
             if (remainingLen < 4) return null;
             int vehiclesLength = ByteSerializable.readInt(index, data);
+            if (vehiclesLength > 100) System.out.println("Prepare for Heap Space error: " + vehiclesLength);
             VehiclePacket[] vehicles = new VehiclePacket[vehiclesLength];
             index += 4;
             remainingLen -= 4;

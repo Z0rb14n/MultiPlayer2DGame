@@ -4,18 +4,15 @@ import game.GameLogger;
 import game.net.GameServer;
 import game.net.NetworkConstants;
 
-import java.util.Timer;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Scanner;
-import java.util.TimerTask;
 
 public class ServerCLI {
     private static ServerCLI singleton;
-    private Timer timer;
     private final HashMap<String,ServerCommand> commands = new HashMap<>();
     private final GameServer server;
-    private final ServerCLITask task = new ServerCLITask();
+    private final ServerCLITask task = new ServerCLITask(Math.floorDiv(1000,165));
     public static ServerCLI getInstance() {
         if (singleton == null) singleton = new ServerCLI();
         return singleton;
@@ -31,8 +28,7 @@ public class ServerCLI {
         }
         commands.put("stop",new ServerStopCommand());
 
-        timer = new Timer("ServerUpdateTimerThread",true);
-        timer.scheduleAtFixedRate(task,0, Math.floorDiv(1000,165));
+        task.start();
     }
 
     private void update() {
@@ -40,13 +36,11 @@ public class ServerCLI {
     }
 
     public boolean isActive() {
-        return timer != null;
+        return task.active;
     }
 
     public void stop() {
-        task.cancel();
-        timer.cancel();
-        timer = null;
+        task.stopServer();
     }
 
     private void sendCommand(String command) {
@@ -72,10 +66,27 @@ public class ServerCLI {
         }
     }
 
-    private class ServerCLITask extends TimerTask {
+    private class ServerCLITask extends Thread {
+        private boolean active = true;
+        private final long period;
+        public ServerCLITask(long period) {
+            super("ServerCLIThread");
+            this.period = period;
+        }
+
+        public void stopServer() {
+            active = false;
+        }
         @Override
         public void run() {
-            update();
+            while (active) {
+                update();
+                try {
+                    Thread.sleep(period);
+                } catch (InterruptedException ex) {
+                    ex.printStackTrace();
+                }
+            }
         }
     }
 }

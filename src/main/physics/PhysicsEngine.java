@@ -47,12 +47,16 @@ public class PhysicsEngine {
         physicsObjects.remove(object);
     }
 
-
-    public void update(float dt) {
+    public void updateRemovals() {
         for (PhysicsBehaviour object : removalQueue) {
             removeImmediate(object);
         }
         removalQueue.clear();
+    }
+
+
+    public void update(float dt) {
+        updateRemovals();
         ArrayList<Pair<PhysicsBehaviour, ConvexShape>> objectUpdateQueue = new ArrayList<>();
         for (PhysicsBehaviour object : physicsObjects) {
             ConvexShape result = object.physicsUpdate(dt);
@@ -65,10 +69,7 @@ public class PhysicsEngine {
         }
         objectUpdateQueue.clear();
         updateColStep();
-        for (PhysicsBehaviour object : removalQueue) {
-            removeImmediate(object);
-        }
-        removalQueue.clear();
+        updateRemovals();
     }
 
     private void updateColStep() {

@@ -33,7 +33,7 @@ public class BasicClient implements Runnable {
         input = socket.getInputStream();
         output = socket.getOutputStream();
 
-        thread = new Thread(this);
+        thread = new Thread(this, "ClientThread");
         thread.start();
     }
 

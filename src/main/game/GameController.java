@@ -85,7 +85,6 @@ public class GameController {
         hierarchy.addObject(createBoundingBox(bot));
         hierarchy.addObject(createBoundingBox(left));
         hierarchy.addObject(createBoundingBox(right));
-
     }
 
     public void createBall(VehicleObject object, int id) {
@@ -96,6 +95,11 @@ public class GameController {
         BallObject bo = new BallObject(engine, hierarchy.getRoot(), ballPos, dir.mult(350), id);
         balls.add(bo);
         hierarchy.addObject(bo);
+    }
+
+    public void removeBall(BallObject ball) {
+        // hierarchy.removeObject(ball); // already called in ball's destroy method
+        balls.remove(ball);
     }
 
     public void render(Graphics2D g) {
@@ -206,6 +210,7 @@ public class GameController {
             balls.add(bo);
             hierarchy.addObject(bo);
         }
+        engine.updateRemovals();
     }
 
     public GameStatePacket asGameStatePacket() {

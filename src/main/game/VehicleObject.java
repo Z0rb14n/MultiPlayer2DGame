@@ -7,7 +7,7 @@ import physics.shape.RotatedTriangle;
 
 import java.awt.*;
 
-public class VehicleObject extends GameObject {
+public class VehicleObject extends GameObject implements GameObjectBehaviour {
     public static int VEHICLE_COLLISION_MASK = 0b10;
     private final RotatedTriangle triangle;
     private final PhysicsBehaviour behaviour;
@@ -32,6 +32,7 @@ public class VehicleObject extends GameObject {
         addBehaviour(behaviour);
         RotatedTriangleRenderer renderer = new RotatedTriangleRenderer(this, Color.RED, true);
         addBehaviour(renderer);
+        addBehaviour(this);
         this.id = id;
     }
 
@@ -65,5 +66,23 @@ public class VehicleObject extends GameObject {
 
     public int getId() {
         return id;
+    }
+
+    @Override
+    public void onCollision(PhysicsBehaviour src, PhysicsBehaviour target, Vec2D mtv) {
+        GameObject other = target.getParentObject();
+        if (other == this) {
+            other = src.getParentObject();
+            System.out.println("lol -- VEHICLE OBJECT ON COLLISION FUNNY");
+        }
+
+        if (other instanceof BallObject) {
+            BallObject ball = (BallObject) other;
+            if (ball.getId() == id) {
+                return;
+            }
+            System.out.println("vehicle collided with ball");
+            ball.destroy();
+        }
     }
 }

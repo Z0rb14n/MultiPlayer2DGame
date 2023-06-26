@@ -1,5 +1,8 @@
 package engine;
 
+import game.BallObject;
+import game.GameLogger;
+
 import java.util.ArrayList;
 import java.util.Collections;
 

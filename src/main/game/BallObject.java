@@ -42,6 +42,12 @@ public class BallObject extends GameObject implements GameObjectBehaviour {
         return counter;
     }
 
+    public void destroy() {
+        parent.removeObject(this);
+        GameController.getInstance().removeBall(this);
+    }
+
+
     @Override
     public void physicsUpdate() {
         Vec2D pos = getPosition();
@@ -55,7 +61,7 @@ public class BallObject extends GameObject implements GameObjectBehaviour {
         counter++;
         //GameLogger.getDefault().log("BOUNCE COUNT " + counter,"DEBUG");
         if (counter > BALL_MAX_BOUNCES) {
-            parent.removeObject(this);
+            destroy();
         }
     }
 }

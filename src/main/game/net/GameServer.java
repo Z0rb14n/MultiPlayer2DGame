@@ -1,6 +1,7 @@
 package game.net;
 
 import game.GameController;
+import game.GameLogger;
 import net.BasicClient;
 import net.BasicServer;
 import net.ServerNetworkEventReceiver;
@@ -46,11 +47,16 @@ public class GameServer implements ServerNetworkEventReceiver {
         clientIDs.remove(c);
     }
 
+    private long lastPacket = 0;
+
     public void update() {
         controller.update();
         controller.processInputs(getInputs());
         controller.processMovementInputs();
         server.writePacket(controller.asGameStatePacket());
+        long diff = System.currentTimeMillis() - lastPacket;
+        GameLogger.getDefault().log("Packet Diff: " + diff, "PERFORMANCE");
+        lastPacket = System.currentTimeMillis();
     }
 
     private HashMap<Integer, InputPacket> getInputs() {
