@@ -1,5 +1,6 @@
 package ui.server;
 
+import game.GameLogger;
 import game.net.GameServer;
 import game.net.NetworkConstants;
 
@@ -56,7 +57,7 @@ public class ServerCLI {
             System.arraycopy(split,1,args,0,split.length - 1);
             commands.get(split[0]).call(args);
         } else {
-            System.out.println("Command not found: " + split[0]);
+            GameLogger.getDefault().log("Command not found: " + split[0]);
         }
     }
 

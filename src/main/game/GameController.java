@@ -153,7 +153,6 @@ public class GameController {
             VehicleObject vehicle = vehicles.get(id);
             if (vehicle == null) continue;
             HashSet<GameInput> inputs = playerInputs.get(id);
-            System.out.println(inputs.size());
 
             float forceAmount = 0.2f;
             float force = 0;

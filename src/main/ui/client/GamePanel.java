@@ -29,7 +29,9 @@ public class GamePanel extends JPanel implements KeyListener {
     }
 
     void update() {
-        handleInputs();
+        synchronized (lock) {
+            handleInputs();
+        }
     }
 
     void update(GameStatePacket packet) {

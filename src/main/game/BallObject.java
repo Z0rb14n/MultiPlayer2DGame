@@ -45,7 +45,6 @@ public class BallObject extends GameObject implements GameObjectBehaviour {
     @Override
     public void physicsUpdate() {
         Vec2D pos = getPosition();
-        //System.out.println(pos);
         if (pos.getX() < 10 || pos.getX() > GameController.GAME_WIDTH-10 || pos.getY() < 10 || pos.getY() > GameController.GAME_HEIGHT-10) {
             GameLogger.getDefault().log("BALL OUT OF BOUNDS: " + pos,"IGNORE");
         }

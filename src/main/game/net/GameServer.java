@@ -59,7 +59,6 @@ public class GameServer implements ServerNetworkEventReceiver {
             // note we may have multiple packets from the same client
             InputPacket packet = (InputPacket) c.readPacket();
             if (packet == null) continue;
-            System.out.println("Received input: " + packet);
             while (c.available() > 0) {
                 InputPacket read = (InputPacket) c.readPacket();
                 packet = InputPacket.add(packet, read);
