@@ -14,6 +14,10 @@ public interface ByteSerializable {
      */
     byte[] toByteArray();
 
+    static void writeShort(short value, byte[] bytes, int startIndex) {
+        ByteBuffer.wrap(bytes, startIndex, 2).putShort(value);
+    }
+
     static void writeInt(int value, byte[] bytes, int startIndex) {
         ByteBuffer.wrap(bytes, startIndex, 4).putInt(value);
     }
@@ -24,6 +28,10 @@ public interface ByteSerializable {
 
     static int readInt(int index, byte[] data) {
         return ByteBuffer.wrap(data, index, 4).getInt();
+    }
+
+    static int readShort(int index, byte[] data) {
+        return ByteBuffer.wrap(data, index, 2).getShort();
     }
 
     static float readFloat(int index, byte[] data) {

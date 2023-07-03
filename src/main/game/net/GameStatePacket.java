@@ -6,10 +6,6 @@ import net.ByteSerializable;
 import net.ByteSerializableFactory;
 import net.MagicConstDeserializer;
 
-import java.io.ByteArrayOutputStream;
-import java.nio.ByteBuffer;
-import java.util.Collection;
-
 public class GameStatePacket implements ByteSerializable {
     static final int MAGIC_NUMBER = 0x71717171;
     private static final VehiclePacket.VehiclePacketFactory vehiclePacketFactory = new VehiclePacket.VehiclePacketFactory();
@@ -25,10 +21,6 @@ public class GameStatePacket implements ByteSerializable {
 
     public BallPacket[] balls;
     public VehiclePacket[] vehicles;
-
-    public GameStatePacket(Collection<BallObject> balls, Collection<VehicleObject> vehicles) {
-        this(balls.toArray(new BallObject[0]), vehicles.toArray(new VehicleObject[0]));
-    }
 
     public GameStatePacket(BallObject[] balls, VehicleObject[] vehicles) {
         this.balls = new BallPacket[balls.length];
@@ -53,41 +45,44 @@ public class GameStatePacket implements ByteSerializable {
 
     @Override
     public byte[] toByteArray() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        // use byte buffer to wrap
-        baos.write(ByteBuffer.allocate(4).putInt(balls.length).array(),0,4);
+        byte[] bytes = new byte[2 + balls.length * BallPacket.PACKET_LEN + 2 + vehicles.length * VehiclePacket.PACKET_LEN];
+        ByteSerializable.writeShort((short) balls.length, bytes, 0);
+        int offset = 2;
         for (BallPacket ball : balls) {
-            baos.write(ball.toByteArray(), 0, BallPacket.PACKET_LEN);
+            ball.writeToArray(bytes, offset);
+            offset += BallPacket.PACKET_LEN;
         }
-        baos.write(ByteBuffer.allocate(4).putInt(vehicles.length).array(),0,4);
+        ByteSerializable.writeShort((short) vehicles.length, bytes, offset);
+        offset += 2;
         for (VehiclePacket vehicle : vehicles) {
-            baos.write(vehicle.toByteArray(), 0, VehiclePacket.PACKET_LEN);
+            vehicle.writeToArray(bytes, offset);
+            offset += VehiclePacket.PACKET_LEN;
         }
-        return baos.toByteArray();
+        return bytes;
     }
 
     private static class GameStatePacketFactory implements ByteSerializableFactory<GameStatePacket> {
         @Override
         public GameStatePacket deserialize(byte[] data, int index, int len) {
-            if (len < 4) return null;
-            int ballsLength = ByteSerializable.readInt(index, data);
+            if (len < 2) return null;
+            int ballsLength = ByteSerializable.readShort(index, data);
             if (ballsLength < 0) System.err.println("Invalid balls length: " + ballsLength);
             if (ballsLength > 100) System.out.println("Prepare for Heap Space error: " + ballsLength);
             BallPacket[] balls = new BallPacket[ballsLength];
-            index += 4;
-            int remainingLen = len - 4;
+            index += 2;
+            int remainingLen = len - 2;
             for (int i = 0; i < ballsLength; i++) {
                 balls[i] = ballPacketFactory.deserialize(data, index, remainingLen);
                 if (balls[i] == null) return null;
                 index += BallPacket.PACKET_LEN;
                 remainingLen -= BallPacket.PACKET_LEN;
             }
-            if (remainingLen < 4) return null;
-            int vehiclesLength = ByteSerializable.readInt(index, data);
+            if (remainingLen < 2) return null;
+            int vehiclesLength = ByteSerializable.readShort(index, data);
             if (vehiclesLength > 100) System.out.println("Prepare for Heap Space error: " + vehiclesLength);
             VehiclePacket[] vehicles = new VehiclePacket[vehiclesLength];
-            index += 4;
-            remainingLen -= 4;
+            index += 2;
+            remainingLen -= 2;
             for (int i = 0; i < vehiclesLength; i++) {
                 vehicles[i] = vehiclePacketFactory.deserialize(data, index, remainingLen);
                 if (vehicles[i] == null) return null;

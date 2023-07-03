@@ -58,19 +58,22 @@ public class BallPacket implements ByteSerializable {
     @Override
     public byte[] toByteArray() {
         byte[] bytes = new byte[PACKET_LEN];
-        int index = 0;
-        ByteSerializable.writeFloat(position.getX(), bytes, index);
-        index += 4;
-        ByteSerializable.writeFloat(position.getY(), bytes, index);
-        index += 4;
-        ByteSerializable.writeFloat(velocity.getX(), bytes, index);
-        index += 4;
-        ByteSerializable.writeFloat(velocity.getY(), bytes, index);
-        index += 4;
-        ByteSerializable.writeInt(id, bytes, index);
-        index += 4;
-        ByteSerializable.writeInt(bounceCount, bytes, index);
+        writeToArray(bytes, 0);
         return bytes;
+    }
+
+    public void writeToArray(byte[] array, int offset) {
+        ByteSerializable.writeFloat(position.getX(), array, offset);
+        offset += 4;
+        ByteSerializable.writeFloat(position.getY(), array, offset);
+        offset += 4;
+        ByteSerializable.writeFloat(velocity.getX(), array, offset);
+        offset += 4;
+        ByteSerializable.writeFloat(velocity.getY(), array, offset);
+        offset += 4;
+        ByteSerializable.writeInt(id, array, offset);
+        offset += 4;
+        ByteSerializable.writeInt(bounceCount, array, offset);
     }
 
     static class BallPacketFactory implements ByteSerializableFactory<BallPacket> {
