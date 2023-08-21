@@ -1,5 +1,6 @@
 package net;
 
+import java.nio.ByteBuffer;
 import java.util.HashMap;
 
 public class MagicConstDeserializer {
@@ -15,5 +16,10 @@ public class MagicConstDeserializer {
             return factory.deserialize(data, offset + 4, len);
         }
         return null;
+    }
+
+    public static byte[] serialize(ByteSerializable serializable) {
+        byte[] data = serializable.toByteArray();
+        return ByteBuffer.allocate(data.length+4).putInt(serializable.getMagicNumber()).put(data, 0, data.length).array();
     }
 }
