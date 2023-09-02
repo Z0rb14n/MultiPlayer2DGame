@@ -7,27 +7,27 @@ import java.util.ArrayList;
 /**
  * Processing's Server class modified to not use PApplet
  */
-public class BasicServer implements Runnable {
-    private final ArrayList<ServerNetworkEventReceiver> networkEventReceivers = new ArrayList<>(1);
+public class TCPServer implements Runnable {
+    private final ArrayList<TCPServerNetworkEventReceiver> networkEventReceivers = new ArrayList<>(1);
     private volatile Thread thread;
     private ServerSocket server;
     private final Object clientsLock = new Object[0];
-    private ArrayList<BasicClient> clients = new ArrayList<>(10);
+    private ArrayList<TCPClient> clients = new ArrayList<>(10);
 
     /**
      * @param port port used to transfer data
      */
-    public BasicServer(int port) throws IOException {
+    public TCPServer(int port) throws IOException {
         server = new ServerSocket(port);
         thread = new Thread(this);
         thread.start();
     }
 
-    public void addNetworkEventReceiver(ServerNetworkEventReceiver networkEventReceiver) {
+    public void addNetworkEventReceiver(TCPServerNetworkEventReceiver networkEventReceiver) {
         networkEventReceivers.add(networkEventReceiver);
     }
 
-    public void removeNetworkEventReceiver(ServerNetworkEventReceiver networkEventReceiver) {
+    public void removeNetworkEventReceiver(TCPServerNetworkEventReceiver networkEventReceiver) {
         networkEventReceivers.remove(networkEventReceiver);
     }
 
@@ -40,7 +40,7 @@ public class BasicServer implements Runnable {
      * Disconnect a particular client
      * @param client the client to disconnect
      */
-    public void disconnect(BasicClient client) {
+    public void disconnect(TCPClient client) {
         client.stop();
         synchronized (clientsLock) {
             int index = clientIndex(client);
@@ -52,7 +52,7 @@ public class BasicServer implements Runnable {
 
     private void removeIndex(int index) {
         synchronized (clientsLock) {
-            for (ServerNetworkEventReceiver networkEventReceiver : networkEventReceivers)
+            for (TCPServerNetworkEventReceiver networkEventReceiver : networkEventReceivers)
                 networkEventReceiver.removeClientEvent(this, clients.get(index));
             clients.remove(index);
         }
@@ -65,7 +65,7 @@ public class BasicServer implements Runnable {
                     clients.get(0).stop();
                 } catch (Exception ignored) {
                 }
-                for (ServerNetworkEventReceiver networkEventReceiver : networkEventReceivers)
+                for (TCPServerNetworkEventReceiver networkEventReceiver : networkEventReceivers)
                     networkEventReceiver.removeClientEvent(this, clients.get(0));
                 clients.remove(0);
             }
@@ -73,14 +73,14 @@ public class BasicServer implements Runnable {
     }
 
 
-    private void addClient(BasicClient client) {
+    private void addClient(TCPClient client) {
         synchronized (clientsLock) {
             clients.add(client);
         }
     }
 
 
-    private int clientIndex(BasicClient client) {
+    private int clientIndex(TCPClient client) {
         synchronized (clientsLock) {
             for (int i = 0; i < clients.size(); i++) {
                 if (clients.get(i) == client) return i;
@@ -117,14 +117,14 @@ public class BasicServer implements Runnable {
      * <p>
      * Client may be dead - check for active.
      */
-    public BasicClient available() {
+    public TCPClient available() {
         synchronized (clientsLock) {
             int index = lastAvailable + 1;
             if (index >= clients.size()) index = 0;
 
             for (int i = 0; i < clients.size(); i++) {
                 int which = (index + i) % clients.size();
-                BasicClient client = clients.get(which);
+                TCPClient client = clients.get(which);
                 //Check for valid client
                 if (!client.active()) {
                     removeIndex(which);  //Remove dead client
@@ -170,10 +170,10 @@ public class BasicServer implements Runnable {
         while (Thread.currentThread() == thread) {
             try {
                 Socket socket = server.accept();
-                BasicClient client = new BasicClient(socket);
+                TCPClient client = new TCPClient(socket);
                 synchronized (clientsLock) {
                     addClient(client);
-                    for(ServerNetworkEventReceiver networkEventReceiver : networkEventReceivers)
+                    for(TCPServerNetworkEventReceiver networkEventReceiver : networkEventReceivers)
                         networkEventReceiver.clientConnectionEvent(this, client);
                 }
             } catch (SocketException e) {

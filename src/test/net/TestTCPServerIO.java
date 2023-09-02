@@ -10,15 +10,15 @@ import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TestBasicServerIO {
+public class TestTCPServerIO {
     private static final int PORT = 5204;
-    private static BasicServer server;
-    private static BasicClient client;
+    private static TCPServer server;
+    private static TCPClient client;
 
     @BeforeAll
     public static void setup() throws IOException {
-        server = new BasicServer(PORT);
-        client = new BasicClient("localhost", PORT);
+        server = new TCPServer(PORT);
+        client = new TCPClient("localhost", PORT);
         assertTrue(server.active());
         assertTrue(client.active());
     }

@@ -1,7 +1,7 @@
 package ui.server;
 
 import game.GameLogger;
-import game.net.GameServer;
+import game.net.UDPGameServer;
 import game.net.NetworkConstants;
 
 import java.io.IOException;
@@ -11,7 +11,7 @@ import java.util.Scanner;
 public class ServerCLI {
     private static ServerCLI singleton;
     private final HashMap<String,ServerCommand> commands = new HashMap<>();
-    private final GameServer server;
+    private final UDPGameServer server;
     private final ServerCLITask task = new ServerCLITask(Math.floorDiv(1000,165));
     public static ServerCLI getInstance() {
         if (singleton == null) singleton = new ServerCLI();
@@ -20,7 +20,7 @@ public class ServerCLI {
 
     private ServerCLI() {
         try {
-            server = new GameServer();
+            server = new UDPGameServer();
             System.out.println("Server started on port " + NetworkConstants.PORT);
         } catch (IOException e) {
             e.printStackTrace();

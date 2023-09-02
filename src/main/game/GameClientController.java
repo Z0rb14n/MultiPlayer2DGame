@@ -1,18 +1,19 @@
 package game;
 
+import game.net.ClientConnectPacket;
 import game.net.GameStatePacket;
 import game.net.InitGameInfoPacket;
 import game.net.NetworkConstants;
-import net.BasicClient;
 import net.ByteSerializable;
-import net.ClientNetworkEventReceiver;
+import net.udp.UDPClient;
+import net.udp.UDPClientNetworkEventReceiver;
 import ui.client.GameFrame;
 
 import java.io.IOException;
 import java.net.SocketException;
 import java.util.ArrayList;
 
-public class GameClientController implements ClientNetworkEventReceiver {
+public class GameClientController implements UDPClientNetworkEventReceiver {
     private static GameClientController singleton;
 
     private GameClientController() {
@@ -23,14 +24,15 @@ public class GameClientController implements ClientNetworkEventReceiver {
         return singleton;
     }
 
-    private BasicClient client;
+    private UDPClient client;
     private int playerNumber;
     private final ArrayList<Integer> currentPlayers = new ArrayList<>();
     public NetworkInstantiationResult connect(String ip) {
         try {
             GameLogger.getDefault().log("Starting instantiation of client...", "NETWORK");
-            client = new BasicClient(ip, NetworkConstants.PORT, 5000);
+            client = new UDPClient(ip, NetworkConstants.PORT);
             GameLogger.getDefault().log("Client instantiated.", "NETWORK");
+            client.writePacket(new ClientConnectPacket("funny"));
             InitGameInfoPacket.ensureFactoryInitialized();
             GameStatePacket.registerFactory();
             ByteSerializable packet = spinReadPacket(500);
@@ -80,7 +82,7 @@ public class GameClientController implements ClientNetworkEventReceiver {
     }
 
     private ByteSerializable spinReadPacket(int retries) {
-        return spinReadPacket(retries, 1);
+        return spinReadPacket(retries, 100);
     }
     private ByteSerializable spinReadPacket(int retries, long sleep) {
         for (int i = 0; i < retries; i++) {
@@ -100,7 +102,7 @@ public class GameClientController implements ClientNetworkEventReceiver {
     }
 
     @Override
-    public void dataReceivedEvent(BasicClient c) {
+    public void dataReceivedEvent(UDPClient c, byte[] data) {
         GameLogger.getDefault().log("Client::dataReceivedEvent", "NETWORK");
         ByteSerializable packet = c.readPacket();
         if (packet == null) return;
@@ -111,8 +113,10 @@ public class GameClientController implements ClientNetworkEventReceiver {
         }
     }
 
+    /*
+
     @Override
-    public void disconnectEvent(BasicClient c) {
+    public void disconnectEvent(NetworkClient c) {
         System.out.println("Client::disconnectEvent");
         ArrayList<ByteSerializable> packets = new ArrayList<>();
         ByteSerializable packet;
@@ -132,10 +136,11 @@ public class GameClientController implements ClientNetworkEventReceiver {
     }
 
     @Override
-    public void endOfStreamEvent(BasicClient c) {
+    public void endOfStreamEvent(NetworkClient c) {
         System.out.println("Client::endOfStreamEvent");
         GameFrame.getInstance().endGame();
     }
+    */
 
     public enum NetworkInstantiationResult {
         SUCCESS, FAILURE, TIMEOUT, ALREADY_CONNECTED

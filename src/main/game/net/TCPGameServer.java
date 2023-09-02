@@ -2,28 +2,28 @@ package game.net;
 
 import game.GameController;
 import game.GameLogger;
-import net.BasicClient;
-import net.BasicServer;
-import net.ServerNetworkEventReceiver;
+import net.TCPClient;
+import net.TCPServer;
+import net.TCPServerNetworkEventReceiver;
 import physics.Vec2D;
 
 import java.io.IOException;
 import java.util.HashMap;
 
-public class GameServer implements ServerNetworkEventReceiver {
-    private final HashMap<Integer, BasicClient> clients = new HashMap<>();
-    private final HashMap<BasicClient, Integer> clientIDs = new HashMap<>();
-    private final BasicServer server;
+public class TCPGameServer implements TCPServerNetworkEventReceiver {
+    private final HashMap<Integer, TCPClient> clients = new HashMap<>();
+    private final HashMap<TCPClient, Integer> clientIDs = new HashMap<>();
+    private final TCPServer server;
     private final GameController controller = GameController.getInstance();
     private int nextID = 0;
-    public GameServer() throws IOException {
-        server = new BasicServer(NetworkConstants.PORT);
+    public TCPGameServer() throws IOException {
+        server = new TCPServer(NetworkConstants.PORT);
         server.addNetworkEventReceiver(this);
         InputPacket.ensureFactoryRegistered();
     }
 
     @Override
-    public void clientConnectionEvent(BasicServer s, BasicClient c) {
+    public void clientConnectionEvent(TCPServer s, TCPClient c) {
         assert(s == server);
         int id = nextID++;
         Integer[] ids = clients.keySet().toArray(new Integer[0]);
@@ -39,7 +39,7 @@ public class GameServer implements ServerNetworkEventReceiver {
     }
 
     @Override
-    public void removeClientEvent(BasicServer s, BasicClient c) {
+    public void removeClientEvent(TCPServer s, TCPClient c) {
         assert(s == server);
         int id = clientIDs.get(c);
         controller.removeVehicle(id);
@@ -61,7 +61,7 @@ public class GameServer implements ServerNetworkEventReceiver {
 
     private HashMap<Integer, InputPacket> getInputs() {
         HashMap<Integer, InputPacket> inputs = new HashMap<>();
-        for (BasicClient c : clients.values()) {
+        for (TCPClient c : clients.values()) {
             // note we may have multiple packets from the same client
             InputPacket packet = (InputPacket) c.readPacket();
             if (packet == null) continue;

@@ -13,9 +13,9 @@ import java.util.ArrayList;
 /**
  * Processing's Client class but modified to not use PApplet
  */
-public class BasicClient implements Runnable {
+public class TCPClient implements Runnable {
     private static final int MAX_BUFFER_SIZE = 1 << 27; // 128 MB
-    private final ArrayList<ClientNetworkEventReceiver> networkEventReceivers = new ArrayList<>(1);
+    private final ArrayList<TCPClientNetworkEventReceiver> networkEventReceivers = new ArrayList<>(1);
     private volatile Thread thread;
     private Socket socket;
     private InputStream input;
@@ -25,7 +25,7 @@ public class BasicClient implements Runnable {
     private int bufferIndex;
     private int bufferLast;
 
-    public BasicClient(String host, int port, int timeout) throws IOException {
+    public TCPClient(String host, int port, int timeout) throws IOException {
         this.socket = new Socket();
         socket.connect(new InetSocketAddress(host, port), timeout);
         socket.setSoTimeout(timeout);
@@ -41,14 +41,14 @@ public class BasicClient implements Runnable {
      * @param host address of the server
      * @param port port to read/write from on the server
      */
-    public BasicClient(String host, int port) throws IOException {
+    public TCPClient(String host, int port) throws IOException {
         this(new Socket(host, port));
     }
 
     /**
      * @param socket any object of type Socket
      */
-    public BasicClient(Socket socket) throws IOException {
+    public TCPClient(Socket socket) throws IOException {
         this.socket = socket;
 
         input = socket.getInputStream();
@@ -58,11 +58,11 @@ public class BasicClient implements Runnable {
         thread.start();
     }
 
-    public void addNetworkEventReceiver(ClientNetworkEventReceiver networkEventReceiver) {
+    public void addNetworkEventReceiver(TCPClientNetworkEventReceiver networkEventReceiver) {
         networkEventReceivers.add(networkEventReceiver);
     }
 
-    public void removeNetworkEventReceiver(ClientNetworkEventReceiver networkEventReceiver) {
+    public void removeNetworkEventReceiver(TCPClientNetworkEventReceiver networkEventReceiver) {
         networkEventReceivers.remove(networkEventReceiver);
     }
 
@@ -76,7 +76,7 @@ public class BasicClient implements Runnable {
      */
     public void stop() {
         if (thread != null) {
-            for (ClientNetworkEventReceiver networkEventReceiver : networkEventReceivers)
+            for (TCPClientNetworkEventReceiver networkEventReceiver : networkEventReceivers)
                 networkEventReceiver.disconnectEvent(this);
         }
         dispose();
@@ -86,7 +86,7 @@ public class BasicClient implements Runnable {
     /**
      * Disconnect from the server and frees resources without informing listeners.
      * <p></p>
-     * Generally use {@link BasicClient#stop()} instead.
+     * Generally use {@link TCPClient#stop()} instead.
      */
     public void dispose() {
         thread = null;
@@ -151,7 +151,7 @@ public class BasicClient implements Runnable {
                     // read returns -1 if end-of-stream occurs (for example if the host disappears)
                     if (readCount == -1) {
                         System.err.println("Client got end-of-stream.");
-                        for (ClientNetworkEventReceiver networkEventReceiver : networkEventReceivers)
+                        for (TCPClientNetworkEventReceiver networkEventReceiver : networkEventReceivers)
                             networkEventReceiver.endOfStreamEvent(this);
                         stop();
                         return;
@@ -187,7 +187,7 @@ public class BasicClient implements Runnable {
                     }
 
                     // now post an event
-                    for (ClientNetworkEventReceiver networkEventReceiver : networkEventReceivers)
+                    for (TCPClientNetworkEventReceiver networkEventReceiver : networkEventReceivers)
                         networkEventReceiver.dataReceivedEvent(this);
                 }
             } catch (IOException e) {
@@ -242,7 +242,7 @@ public class BasicClient implements Runnable {
     /**
      * Returns a number between 0 and 255 for the next byte that's waiting in
      * the buffer. Returns -1 if there is no byte, although this should be
-     * avoided by first checking {@link BasicClient#available()} to see if any data is available.
+     * avoided by first checking {@link TCPClient#available()} to see if any data is available.
      */
     public byte read() {
         synchronized (bufferLock) {
@@ -270,7 +270,7 @@ public class BasicClient implements Runnable {
      * Return a byte array of anything that's in the serial buffer.
      * Not particularly memory/speed efficient, because it creates
      * a byte array on each read, but it's easier to use than
-     * {@link net.BasicClient#readBytes(byte[])}.
+     * {@link TCPClient#readBytes(byte[])}.
      */
     public byte[] readBytes() {
         synchronized (bufferLock) {
@@ -292,7 +292,7 @@ public class BasicClient implements Runnable {
      * up to the specified maximum number of bytes.
      * Not particularly memory/speed efficient, because it creates
      * a byte array on each read, but it's easier to use than
-     * {@link net.BasicClient#readBytes(byte[])}.
+     * {@link TCPClient#readBytes(byte[])}.
      *
      * @param max the maximum number of bytes to read
      */

@@ -1,6 +1,7 @@
 package net.udp;
 
 import net.ByteSerializable;
+import net.TCPClientNetworkEventReceiver;
 import net.MagicConstDeserializer;
 
 import java.io.IOException;
@@ -16,6 +17,20 @@ public class UDPClient implements Runnable {
     private final InetAddress hostName;
     private final int hostPort;
 
+    public UDPClient(String host, int hostPort) throws IOException {
+        this(host, hostPort, 1000);
+    }
+
+    public UDPClient(String host, int hostPort, int timeout) throws IOException {
+        this.socket = new DatagramSocket();
+        hostName = InetAddress.getByName(host);
+        this.hostPort = hostPort;
+        socket.setSoTimeout(timeout);
+        thread = new Thread(this, "ClientThread");
+        thread.start();
+        System.out.println(this.socket.getPort() + "," + this.socket.getLocalPort());
+    }
+
     public UDPClient(String host, int hostPort, int clientPort, int timeout) throws IOException {
         this.socket = new DatagramSocket(clientPort);
         hostName = InetAddress.getByName(host);
@@ -23,10 +38,6 @@ public class UDPClient implements Runnable {
         socket.setSoTimeout(timeout);
         thread = new Thread(this, "ClientThread");
         thread.start();
-    }
-
-    public UDPClient(String host, int hostPort, int clientPort) throws IOException {
-        this(host, hostPort, clientPort, 1000);
     }
 
     public void addNetworkEventReceiver(UDPClientNetworkEventReceiver networkEventReceiver) {
@@ -44,7 +55,7 @@ public class UDPClient implements Runnable {
     /**
      * Disconnect from the server and frees resources.
      */
-    public void dispose() {
+    public void stop() {
         thread = null;
         networkEventReceivers.clear();
 
@@ -57,7 +68,6 @@ public class UDPClient implements Runnable {
             e.printStackTrace();
         }
     }
-
 
     @Override
     public void run() {
@@ -131,6 +141,7 @@ public class UDPClient implements Runnable {
     }
 
     public ByteSerializable readPacket() {
+        if (packets.isEmpty()) return null;
         byte[] packet = packets.remove();
         return MagicConstDeserializer.deserialize(packet, 0, packet.length);
     }

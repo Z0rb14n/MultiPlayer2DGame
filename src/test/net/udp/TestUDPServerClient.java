@@ -19,7 +19,7 @@ public class TestUDPServerClient {
     @BeforeAll
     public static void setup() throws IOException {
         server = new UDPServer(PORT);
-        client = new UDPClient("localhost", PORT, CLIENT_PORT);
+        client = new UDPClient("localhost", PORT, CLIENT_PORT, 1000);
         assertTrue(server.active());
         assertTrue(client.active());
     }
@@ -29,7 +29,7 @@ public class TestUDPServerClient {
         TestPacket packet = TestPacket.generatePacket();
         client.writePacket(packet);
         awaitUntilTrue(1000, () -> !server.packets.isEmpty());
-        TestPacket receivedPacket = (TestPacket) MagicConstDeserializer.deserialize(server.packets.get(0), 0, server.packets.get(0).length);
+        TestPacket receivedPacket = (TestPacket) MagicConstDeserializer.deserialize(server.packets.get(0).first, 0, server.packets.get(0).first.length);
         assertEquals(packet, receivedPacket);
 
         server.writePacket(packet);

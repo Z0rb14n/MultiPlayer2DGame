@@ -17,7 +17,7 @@ public class UDPServer implements Runnable {
     private final HashMap<Pair<InetAddress, Integer>, Long> clients = new HashMap<>();
     private final int receiveTimeout;
     private final int inactivityDelay;
-    public ArrayList<byte[]> packets = new ArrayList<>();
+    public ArrayList<Pair<byte[], Pair<InetAddress, Integer>>> packets = new ArrayList<>();
 
     public UDPServer(int port) throws IOException {
         this(port, 1000, 30000);
@@ -66,7 +66,7 @@ public class UDPServer implements Runnable {
     /**
      * Disconnect all clients and stop the server.
      */
-    public void dispose() {
+    public void stop() {
         thread = null;
         server.close();
     }
@@ -84,7 +84,7 @@ public class UDPServer implements Runnable {
                 System.out.println("Time: " + (System.currentTimeMillis() - prev) + "ms");
                 byte[] data = new byte[packet.getLength()];
                 System.arraycopy(packet.getData(), packet.getOffset(), data, 0, packet.getLength());
-                packets.add(data);
+                packets.add(new Pair<>(data, new Pair<>(packet.getAddress(), packet.getPort())));
                 for (UDPServerNetworkEventReceiver networkEventReceiver : networkEventReceivers)
                     networkEventReceiver.onReceiveData(this, data, packet.getAddress(), packet.getPort());
                 if (clients.containsKey(new Pair<>(packet.getAddress(), packet.getPort()))) {
@@ -94,6 +94,7 @@ public class UDPServer implements Runnable {
                         clients.put(new Pair<>(packet.getAddress(), packet.getPort()), new Date().getTime());
                     }
                 }
+            } catch (SocketTimeoutException ignored) {
             } catch (IOException e) {
                 e.printStackTrace();
                 thread = null;
@@ -123,6 +124,16 @@ public class UDPServer implements Runnable {
                     }
                 }
             }
+        }
+    }
+
+    public void writePacket(ByteSerializable packet, InetAddress address, int port) {
+        byte[] data = MagicConstDeserializer.serialize(packet);
+        DatagramPacket udpPacket = new DatagramPacket(data, data.length, address, port);
+        try {
+            server.send(udpPacket);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }
