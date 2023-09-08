@@ -9,8 +9,6 @@ import physics.broad.SpatialGrid;
 import physics.shape.AxisAlignedBoundingBox;
 import physics.shape.RotatedTriangle;
 
-import java.awt.*;
-import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -26,6 +24,7 @@ public class GameController {
     private final HashMap<Integer, VehicleObject> vehicles = new HashMap<>();
     private final HashMap<Integer, HashSet<GameInput>> playerInputs = new HashMap<>();
     private final ArrayList<BallObject> balls = new ArrayList<>();
+    private final ArrayList<GameObject> boundingBoxes = new ArrayList<>();
     private final SceneHierarchy hierarchy = new SceneHierarchy();
     private static int GAME_SPEED = 3;
     private static GameController singleton;
@@ -71,8 +70,7 @@ public class GameController {
         GameObject gameObject = new GameObject();
         PhysicsBehaviour behaviour = new PhysicsBehaviour(gameObject,engine,box,true);
         gameObject.addBehaviour(behaviour);
-        BoxRenderer renderer = new BoxRenderer(gameObject, Color.BLUE, true);
-        gameObject.addBehaviour(renderer);
+        boundingBoxes.add(gameObject);
         return gameObject;
     }
 
@@ -100,13 +98,6 @@ public class GameController {
     public void removeBall(BallObject ball) {
         // hierarchy.removeObject(ball); // already called in ball's destroy method
         balls.remove(ball);
-    }
-
-    public void render(Graphics2D g) {
-        Time.deltaTime = (System.nanoTime() - Time.lastRenderNano) / 1000000000f;
-        hierarchy.render(g);
-        engine.getBroadphaseStructure().render(g, Color.BLACK);
-        Time.lastRenderNano = System.nanoTime();
     }
 
     public void update() {
@@ -215,5 +206,16 @@ public class GameController {
 
     public GameStatePacket asGameStatePacket() {
         return new GameStatePacket(balls.toArray(new BallObject[0]),vehicles.values().toArray(new VehicleObject[0]));
+    }
+
+    SceneHierarchy getHierarchy() {
+        return hierarchy;
+    }
+
+    PhysicsEngine getEngine() {
+        return engine;
+    }
+    ArrayList<GameObject> getBoundingBoxes() {
+        return boundingBoxes;
     }
 }
