@@ -76,7 +76,7 @@ class GameTestUIFrame extends JFrame {
         @Override
         public void paintComponent(Graphics g) {
             super.paintComponent(g);
-            controller.render((Graphics2D) g);
+            GameControllerRenderer.render((Graphics2D) g);
         }
 
         private void handleInputs() {
