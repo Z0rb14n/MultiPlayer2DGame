@@ -170,24 +170,14 @@ public class GameController {
     }
 
     public void updateFromPacket(GameStatePacket packet) {
-        if (packet.vehicles.length != vehicles.size()) {
-            // delete all vehicles
-            for (VehicleObject vehicle : vehicles.values()) {
-                hierarchy.removeObject(vehicle);
-            }
-            vehicles.clear();
-            // create new vehicles
-            for (int i = 0; i < packet.vehicles.length; i++) {
-                addVehicle(packet.vehicles[i].getPosition(), packet.vehicles[i].getId(), packet.vehicles[i].getVelocity(), packet.vehicles[i].getAngle());
-            }
-        } else {
-            for (VehiclePacket vehiclePacket : packet.vehicles) {
-                VehicleObject vehicle = vehicles.get(vehiclePacket.getId());
-                vehicle.setPosition(vehiclePacket.getPosition());
-                vehicle.setAngle(vehiclePacket.getAngle());
-                PhysicsBehaviour behaviour = vehicle.getBehaviour(PhysicsBehaviour.class);
-                behaviour.setVelocity(vehiclePacket.getVelocity());
-            }
+        // delete all vehicles
+        for (VehicleObject vehicle : vehicles.values()) {
+            hierarchy.removeObject(vehicle);
+        }
+        vehicles.clear();
+        // create new vehicles
+        for (int i = 0; i < packet.vehicles.length; i++) {
+            addVehicle(packet.vehicles[i].getPosition(), packet.vehicles[i].getId(), packet.vehicles[i].getVelocity(), packet.vehicles[i].getAngle());
         }
 
         // delete all balls
