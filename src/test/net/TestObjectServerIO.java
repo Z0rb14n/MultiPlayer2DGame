@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.fail;
 
 public class TestObjectServerIO {
     private static final int PORT = 5204;
@@ -139,6 +138,7 @@ public class TestObjectServerIO {
         assertEquals(p1.getVelocity(), p2.getVelocity());
         assertEquals(p1.getAngle(), p2.getAngle());
         assertEquals(p1.getId(), p2.getId());
+        assertEquals(p1.isDead(), p2.isDead());
     }
 
     private static void assertGamePacketEquals(GameStatePacket p1, GameStatePacket p2) {
@@ -167,7 +167,8 @@ public class TestObjectServerIO {
         Vec2D vel = new Vec2D(random.nextFloat(), random.nextFloat());
         int id = random.nextInt();
         float angle = random.nextFloat();
-        return new VehiclePacket(pos, vel, id, angle);
+        boolean dead = random.nextBoolean();
+        return new VehiclePacket(pos, vel, id, angle, dead);
     }
 
     private static void waitForNumBytesAvailable(int num, int retryCount) {

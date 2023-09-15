@@ -22,11 +22,12 @@ public class VehicleObject extends GameObject implements GameObjectBehaviour {
         vertices[2] = new Vec2D(0,-10);
     }
     private final int id;
+    private boolean dead;
     public VehicleObject(PhysicsEngine engine, Vec2D position, int id) {
-        this(engine, position, id, 0);
+        this(engine, position, id, 0, false);
     }
 
-    public VehicleObject(PhysicsEngine engine, Vec2D position, int id, float angle) {
+    public VehicleObject(PhysicsEngine engine, Vec2D position, int id, float angle, boolean dead) {
         super(position);
         triangle = new RotatedTriangle(vertices);
         triangle.setAngle(angle);
@@ -37,6 +38,7 @@ public class VehicleObject extends GameObject implements GameObjectBehaviour {
         addBehaviour(renderer);
         addBehaviour(this);
         this.id = id;
+        this.dead = dead;
     }
 
     public void rotate(float angle) {
@@ -69,6 +71,14 @@ public class VehicleObject extends GameObject implements GameObjectBehaviour {
 
     public int getId() {
         return id;
+    }
+
+    public boolean isDead() {
+        return dead;
+    }
+
+    public void setDead(boolean dead) {
+        this.dead = dead;
     }
 
     @Override

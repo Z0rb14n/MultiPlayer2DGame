@@ -48,8 +48,8 @@ public class GameController {
         return v;
     }
 
-    public VehicleObject addVehicle(Vec2D pos, int id, Vec2D vel, float angle) {
-        VehicleObject v = new VehicleObject(engine, pos, id, angle);
+    public VehicleObject addVehicle(Vec2D pos, int id, Vec2D vel, float angle, boolean isDead) {
+        VehicleObject v = new VehicleObject(engine, pos, id, angle, isDead);
         // set velocity
         PhysicsBehaviour behaviour = v.getBehaviour(PhysicsBehaviour.class);
         behaviour.setVelocity(vel);
@@ -181,7 +181,7 @@ public class GameController {
         vehicles.clear();
         // create new vehicles
         for (int i = 0; i < packet.vehicles.length; i++) {
-            addVehicle(packet.vehicles[i].getPosition(), packet.vehicles[i].getId(), packet.vehicles[i].getVelocity(), packet.vehicles[i].getAngle());
+            addVehicle(packet.vehicles[i].getPosition(), packet.vehicles[i].getId(), packet.vehicles[i].getVelocity(), packet.vehicles[i].getAngle(), packet.vehicles[i].isDead());
         }
 
         // delete all balls

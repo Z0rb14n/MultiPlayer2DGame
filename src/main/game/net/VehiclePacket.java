@@ -10,7 +10,7 @@ import physics.shape.RotatedTriangle;
 
 public class VehiclePacket implements ByteSerializable {
     static final int MAGIC_NUMBER = 0xAAAA6969;
-    static final int PACKET_LEN = 24;
+    static final int PACKET_LEN = 25;
     static {
         MagicConstDeserializer.registerFactory(VehiclePacket.MAGIC_NUMBER, new VehiclePacket.VehiclePacketFactory());
     }
@@ -19,6 +19,7 @@ public class VehiclePacket implements ByteSerializable {
     private final Vec2D velocity;
     private final int id;
     private final float angle;
+    private final boolean dead;
 
     public VehiclePacket(VehicleObject object) {
         PhysicsBehaviour physics = object.getBehaviour(PhysicsBehaviour.class);
@@ -26,13 +27,15 @@ public class VehiclePacket implements ByteSerializable {
         this.velocity = physics.getVelocity();
         this.id = object.getId();
         this.angle = ((RotatedTriangle) physics.getTranslatedShape()).getAngle();
+        this.dead = object.isDead();
     }
 
-    public VehiclePacket(Vec2D position, Vec2D velocity, int id, float angle) {
+    public VehiclePacket(Vec2D position, Vec2D velocity, int id, float angle, boolean isDead) {
         this.position = position;
         this.velocity = velocity;
         this.id = id;
         this.angle = angle;
+        this.dead = isDead;
     }
 
     @Override
@@ -56,6 +59,10 @@ public class VehiclePacket implements ByteSerializable {
         return angle;
     }
 
+    public boolean isDead() {
+        return dead;
+    }
+
     @Override
     public byte[] toByteArray() {
         byte[] bytes = new byte[PACKET_LEN];
@@ -75,6 +82,8 @@ public class VehiclePacket implements ByteSerializable {
         ByteSerializable.writeInt(id, array, offset);
         offset += 4;
         ByteSerializable.writeFloat(angle, array, offset);
+        offset += 4;
+        array[offset] = (byte) (dead ? 1 : 0);
     }
 
     static class VehiclePacketFactory implements ByteSerializableFactory<VehiclePacket> {
@@ -85,7 +94,8 @@ public class VehiclePacket implements ByteSerializable {
             Vec2D velocity = new Vec2D(ByteSerializable.readFloat(index + 8, data), ByteSerializable.readFloat(index + 12, data));
             int id = ByteSerializable.readInt(index + 16, data);
             float angle = ByteSerializable.readFloat(index + 20, data);
-            return new VehiclePacket(position, velocity, id, angle);
+            boolean dead = data[index + 24] == 1;
+            return new VehiclePacket(position, velocity, id, angle, dead);
         }
     }
 }
