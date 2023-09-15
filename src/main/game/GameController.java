@@ -89,6 +89,7 @@ public class GameController {
     }
 
     public void createBall(VehicleObject object, int id) {
+        if (object.isDead()) return;
         PhysicsBehaviour playerBehaviour = object.getBehaviour(PhysicsBehaviour.class);
         Vec2D playerPos = playerBehaviour.getPosition();
         Vec2D dir = Vec2D.UP.rotated(((RotatedTriangle)playerBehaviour.getShape()).getAngle());
@@ -152,6 +153,7 @@ public class GameController {
             VehicleObject vehicle = vehicles.get(id);
             if (vehicle == null) continue;
             HashSet<GameInput> inputs = playerInputs.get(id);
+            if (vehicle.isDead()) continue;
 
             float forceAmount = 0.2f;
             float force = 0;
@@ -171,6 +173,13 @@ public class GameController {
             vehicle.rotate(rotation);
             vehicle.accelerate(force);
         }
+    }
+
+    public void onDeath(VehicleObject dead, int killer) {
+        dead.setDead(true);
+        dead.getBehaviour(PhysicsBehaviour.class).setStationary(true);
+        dead.getBehaviour(PhysicsBehaviour.class).setEnabled(false);
+        System.out.println(killer + " killed player " + dead.getId());
     }
 
     public void updateFromPacket(GameStatePacket packet) {

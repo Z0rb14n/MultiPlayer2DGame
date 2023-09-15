@@ -89,6 +89,7 @@ public class PhysicsEngine {
         if ((obj1.getCollisionMask() & obj2.getCollisionMask()) == 0) return;
         if ((obj1.getAntiCollisionMask() & obj2.getAntiCollisionMask()) != 0) return;
         if (obj1.getIgnoredBehaviours().contains(obj2) || obj2.getIgnoredBehaviours().contains(obj1)) return;
+        if (!obj1.isEnabled() || !obj2.isEnabled()) return;
         Vec2D mtv = SATTest.getMTV(obj1.getTranslatedShape(), obj2.getTranslatedShape());
         if (mtv == null) return;
         // https://cs.brown.edu/courses/cs1971/lectures/lecture05.pdf

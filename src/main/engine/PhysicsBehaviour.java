@@ -12,6 +12,7 @@ public class PhysicsBehaviour implements GameObjectBehaviour {
     private Vec2D velocity;
     private boolean stationary;
     private boolean awake;
+    private boolean enabled = true;
     private float mass;
     private float coefOfRestitution = 1f;
     private int collisionMask = 0xffffffff;
@@ -93,6 +94,14 @@ public class PhysicsBehaviour implements GameObjectBehaviour {
 
     public int getAntiCollisionMask() {
         return antiCollisionMask;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 
     public void setCollisionMask(int collisionMask) {

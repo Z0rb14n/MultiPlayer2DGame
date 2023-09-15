@@ -96,6 +96,7 @@ public class VehicleObject extends GameObject implements GameObjectBehaviour {
             }
             System.out.println("vehicle collided with ball");
             ball.destroy();
+            GameController.getInstance().onDeath(this, ball.getId());
         }
     }
 }
