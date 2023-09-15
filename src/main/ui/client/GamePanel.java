@@ -68,7 +68,7 @@ public class GamePanel extends JPanel implements KeyListener {
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        GameControllerRenderer.render((Graphics2D) g);
+        GameControllerRenderer.render((Graphics2D) g, GameClientController.getInstance().getPlayerNumber());
     }
 
     private void handleInputs() {

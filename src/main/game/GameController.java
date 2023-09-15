@@ -1,10 +1,12 @@
 package game;
 
-import engine.*;
+import engine.GameObject;
+import engine.PhysicsBehaviour;
+import engine.SceneHierarchy;
 import game.net.GameStatePacket;
 import game.net.InputPacket;
-import game.net.VehiclePacket;
-import physics.*;
+import physics.PhysicsEngine;
+import physics.Vec2D;
 import physics.broad.SpatialGrid;
 import physics.shape.AxisAlignedBoundingBox;
 import physics.shape.RotatedTriangle;
@@ -18,8 +20,8 @@ import java.util.HashSet;
  */
 public class GameController {
     public static int VEHICLE_COLLISION_MASK = 0b10;
-    public static final int GAME_WIDTH = 800;
-    public static final int GAME_HEIGHT = 400;
+    public static final int GAME_WIDTH = 2000;
+    public static final int GAME_HEIGHT = 2000;
     private final PhysicsEngine engine;
     private final HashMap<Integer, VehicleObject> vehicles = new HashMap<>();
     private final HashMap<Integer, HashSet<GameInput>> playerInputs = new HashMap<>();
@@ -51,6 +53,7 @@ public class GameController {
         // set velocity
         PhysicsBehaviour behaviour = v.getBehaviour(PhysicsBehaviour.class);
         behaviour.setVelocity(vel);
+        behaviour.setMass(1000);
         hierarchy.addObject(v);
         vehicles.put(id, v);
         return v;
@@ -91,6 +94,7 @@ public class GameController {
         Vec2D dir = Vec2D.UP.rotated(((RotatedTriangle)playerBehaviour.getShape()).getAngle());
         Vec2D ballPos = playerPos.add(dir.mult(10));
         BallObject bo = new BallObject(engine, hierarchy.getRoot(), ballPos, dir.mult(350), id);
+        bo.getBehaviour(PhysicsBehaviour.class).addToIgnore(playerBehaviour);
         balls.add(bo);
         hierarchy.addObject(bo);
     }

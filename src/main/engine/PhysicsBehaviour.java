@@ -4,6 +4,8 @@ import physics.PhysicsEngine;
 import physics.Vec2D;
 import physics.shape.ConvexShape;
 
+import java.util.HashSet;
+
 public class PhysicsBehaviour implements GameObjectBehaviour {
     private ConvexShape shape;
     private ConvexShape translatedShape;
@@ -16,6 +18,7 @@ public class PhysicsBehaviour implements GameObjectBehaviour {
     private int antiCollisionMask = 0;
     private final PhysicsEngine engine;
     private final GameObject parent;
+    private final HashSet<PhysicsBehaviour> ignoredBehaviours = new HashSet<>();
 
     public PhysicsBehaviour(GameObject parent, PhysicsEngine engine, ConvexShape shape) {
         this(parent,engine,shape,false);
@@ -128,6 +131,22 @@ public class PhysicsBehaviour implements GameObjectBehaviour {
     public void setVelocity(Vec2D velocity) {
         this.velocity = velocity;
         if (!velocity.equals(Vec2D.ZERO)) awake = true;
+    }
+
+    public void addToIgnore(PhysicsBehaviour behaviour) {
+        ignoredBehaviours.add(behaviour);
+    }
+
+    public void removeFromIgnore(PhysicsBehaviour behaviour) {
+        ignoredBehaviours.remove(behaviour);
+    }
+
+    public void clearIgnore(PhysicsBehaviour behaviour) {
+        ignoredBehaviours.clear();
+    }
+
+    public HashSet<PhysicsBehaviour> getIgnoredBehaviours() {
+        return ignoredBehaviours;
     }
 
     @SuppressWarnings("unused")

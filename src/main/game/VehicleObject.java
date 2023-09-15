@@ -1,6 +1,9 @@
 package game;
 
-import engine.*;
+import engine.GameObject;
+import engine.GameObjectBehaviour;
+import engine.PhysicsBehaviour;
+import engine.RotatedTriangleRenderer;
 import physics.PhysicsEngine;
 import physics.Vec2D;
 import physics.shape.RotatedTriangle;
@@ -8,7 +11,7 @@ import physics.shape.RotatedTriangle;
 import java.awt.*;
 
 public class VehicleObject extends GameObject implements GameObjectBehaviour {
-    public static int VEHICLE_COLLISION_MASK = 0b10;
+    public static int VEHICLE_COLLISION_MASK = 0b11;
     private final RotatedTriangle triangle;
     private final PhysicsBehaviour behaviour;
     private static final float maxSpeed = 300;

@@ -1,13 +1,12 @@
 package ui.client;
 
-import game.GameController;
 import game.net.GameStatePacket;
 
 import javax.swing.*;
 import java.awt.*;
 
 public class GameFrame extends JFrame {
-    private static final Dimension SIZE = new Dimension(GameController.GAME_WIDTH,GameController.GAME_HEIGHT + 200);
+    private static final Dimension SIZE = new Dimension(800,600);
 
     private static GameFrame singleton;
 

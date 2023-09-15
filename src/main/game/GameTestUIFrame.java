@@ -12,7 +12,7 @@ import java.util.ArrayDeque;
 import java.util.HashSet;
 
 class GameTestUIFrame extends JFrame {
-    private static final Dimension SIZE = new Dimension(GameController.GAME_WIDTH,GameController.GAME_HEIGHT + 200);
+    private static final Dimension SIZE = new Dimension(800,600);
     private static GameTestUIFrame singleton;
     private final MainPanel mp;
     public static GameTestUIFrame getInstance() {

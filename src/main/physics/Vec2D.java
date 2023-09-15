@@ -112,6 +112,14 @@ public class Vec2D implements Serializable {
     }
 
 
+    public Vec2D clamp(float xMin, float xMax, float yMin, float yMax) {
+        float finalX = x < xMin ? xMin : x;
+        finalX = finalX > xMax ? xMax : finalX;
+        float finalY = y < yMin ? yMin : y;
+        finalY = finalY > yMax ? yMax : finalY;
+        return new Vec2D(finalX, finalY);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof Vec2D)) return false;

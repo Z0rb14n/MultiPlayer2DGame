@@ -19,6 +19,7 @@ public class UDPGameServer implements UDPServerNetworkEventReceiver {
     private final HashMap<Integer, ArrayList<InputPacket>> inputs = new HashMap<>();
     private final UDPServer server;
     private final GameController controller = GameController.getInstance();
+    private final Object lock = new Object[0];
     private int nextID = 0;
     public UDPGameServer() throws IOException {
         server = new UDPServer(NetworkConstants.PORT);
@@ -32,11 +33,12 @@ public class UDPGameServer implements UDPServerNetworkEventReceiver {
         if (clientIDs.containsKey(new Pair<>(clientAddress, clientPort))) {
             int id = clientIDs.get(new Pair<>(clientAddress, clientPort));
             InputPacket packet = (InputPacket) MagicConstDeserializer.deserialize(packetData, 0, packetData.length);
-            if (!inputs.containsKey(id)) {
-                // TODO SYNCRHONIZE?
-                inputs.put(id, new ArrayList<>());
+            synchronized (lock) {
+                if (!inputs.containsKey(id)) {
+                    inputs.put(id, new ArrayList<>());
+                }
+                inputs.get(id).add(packet);
             }
-            inputs.get(id).add(packet);
         } else {
             int id = nextID++;
             Integer[] ids = clients.keySet().toArray(new Integer[0]);
@@ -48,6 +50,7 @@ public class UDPGameServer implements UDPServerNetworkEventReceiver {
             clientIDs.put(new Pair<>(clientAddress, clientPort), id);
             InitGameInfoPacket packet = new InitGameInfoPacket(id, ids2);
             server.writePacket(packet, clientAddress, clientPort);
+            System.out.println("added id: " + id);
             controller.addVehicle(new Vec2D(100,100), id);
         }
     }
@@ -80,10 +83,12 @@ public class UDPGameServer implements UDPServerNetworkEventReceiver {
 
         for (Integer client : inputs.keySet()) {
             InputPacket packet = null;
-            for (InputPacket p : inputs.get(client)) {
-                packet = InputPacket.add(packet, p);
+            synchronized (lock) {
+                for (InputPacket p : inputs.get(client)) {
+                    packet = InputPacket.add(packet, p);
+                }
+                inputs.get(client).clear();
             }
-            inputs.get(client).clear();
             if (packet != null) finalInputs.put(client, packet);
         }
 
