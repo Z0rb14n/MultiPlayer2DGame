@@ -1,5 +1,7 @@
 package game;
 
+import engine.BoxRenderer;
+import engine.GameObject;
 import physics.Vec2D;
 
 import javax.swing.*;
@@ -46,6 +48,11 @@ class GameTestUIFrame extends JFrame {
             super();
             setBackground(Color.WHITE);
             player = controller.addVehicle(new Vec2D(100,100), 0);
+
+            for (GameObject gameObject : GameController.getInstance().getBoundingBoxes()) {
+                BoxRenderer renderer = new BoxRenderer(gameObject, Color.BLUE, true);
+                gameObject.addBehaviour(renderer);
+            }
         }
 
         void update() {

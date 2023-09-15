@@ -205,7 +205,7 @@ public class GameController {
     PhysicsEngine getEngine() {
         return engine;
     }
-    ArrayList<GameObject> getBoundingBoxes() {
+    public ArrayList<GameObject> getBoundingBoxes() {
         return boundingBoxes;
     }
 }

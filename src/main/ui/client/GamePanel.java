@@ -1,5 +1,7 @@
 package ui.client;
 
+import engine.BoxRenderer;
+import engine.GameObject;
 import game.*;
 import game.net.GameStatePacket;
 import game.net.InputPacket;
@@ -23,6 +25,11 @@ public class GamePanel extends JPanel implements KeyListener {
         super();
         setBackground(Color.WHITE);
         addKeyListener(this);
+
+        for (GameObject gameObject : GameController.getInstance().getBoundingBoxes()) {
+            BoxRenderer renderer = new BoxRenderer(gameObject, Color.BLUE, true);
+            gameObject.addBehaviour(renderer);
+        }
     }
 
     void signalGameStart() {
