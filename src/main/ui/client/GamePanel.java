@@ -5,6 +5,7 @@ import engine.GameObject;
 import game.*;
 import game.net.GameStatePacket;
 import game.net.InputPacket;
+import game.net.RespawnRequestPacket;
 import util.Pair;
 
 import javax.swing.*;
@@ -73,6 +74,11 @@ public class GamePanel extends JPanel implements KeyListener {
 
     private void handleInputs() {
         boolean isEmpty = queuedActions.isEmpty();
+        if (hasRespawnQueued) {
+            System.out.println("Sending respawn.");
+            GameClientController.getInstance().sendPacket(new RespawnRequestPacket());
+        }
+        hasRespawnQueued = false;
         if (isEmpty) {
             GameClientController.getInstance().sendPacket(InputPacket.EMPTY);
         } else {
@@ -112,6 +118,7 @@ public class GamePanel extends JPanel implements KeyListener {
 
     private final HashSet<Integer> pressedKeyCodes = new HashSet<>(15);
     private final ArrayDeque<Pair<GameInput, Boolean>> queuedActions = new ArrayDeque<>();
+    private boolean hasRespawnQueued = false;
 
     @Override
     public void keyTyped(KeyEvent e) {
@@ -136,6 +143,10 @@ public class GamePanel extends JPanel implements KeyListener {
         }
         if (isFirstPressed && keyCode == KeyEvent.VK_D) {
             queuedActions.add(new Pair<>(GameInput.RIGHT, true));
+        }
+
+        if (isFirstPressed && keyCode == KeyEvent.VK_R) {
+            hasRespawnQueued = true;
         }
         pressedKeyCodes.add(keyCode);
     }

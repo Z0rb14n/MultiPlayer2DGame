@@ -7,7 +7,7 @@ import net.MagicConstDeserializer;
 public class RespawnRequestPacket implements ByteSerializable {
     static final int MAGIC_NUMBER = 0x43256793;
     static {
-        MagicConstDeserializer.registerFactory(MAGIC_NUMBER, new RespawnRequestPacketFactory());
+        ensureFactoryRegistered();
     }
     @Override
     public int getMagicNumber() {
@@ -17,6 +17,10 @@ public class RespawnRequestPacket implements ByteSerializable {
     @Override
     public byte[] toByteArray() {
         return new byte[0];
+    }
+
+    public static void ensureFactoryRegistered() {
+        MagicConstDeserializer.registerFactory(MAGIC_NUMBER, new RespawnRequestPacketFactory());
     }
 
     static class RespawnRequestPacketFactory implements ByteSerializableFactory<RespawnRequestPacket> {

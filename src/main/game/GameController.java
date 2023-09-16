@@ -175,6 +175,20 @@ public class GameController {
         }
     }
 
+    public void respawn(int id) {
+        VehicleObject object = vehicles.get(id);
+        System.out.println("Respawning.");
+        if (object == null) return;
+        System.out.println("is not null.");
+        if (!object.isDead()) return;
+        System.out.println("is dead.");
+        object.setDead(false);
+        object.getBehaviour(PhysicsBehaviour.class).setStationary(false);
+        object.getBehaviour(PhysicsBehaviour.class).setEnabled(true);
+        System.out.println("Respawn player " + id);
+
+    }
+
     public void onDeath(VehicleObject dead, int killer) {
         dead.setDead(true);
         dead.getBehaviour(PhysicsBehaviour.class).setStationary(true);

@@ -2,6 +2,7 @@ package game.net;
 
 import game.GameController;
 import game.GameLogger;
+import net.ByteSerializable;
 import net.MagicConstDeserializer;
 import net.udp.UDPServer;
 import net.udp.UDPServerNetworkEventReceiver;
@@ -25,6 +26,7 @@ public class UDPGameServer implements UDPServerNetworkEventReceiver {
         server = new UDPServer(NetworkConstants.PORT);
         server.addNetworkEventReceiver(this);
         InputPacket.ensureFactoryRegistered();
+        RespawnRequestPacket.ensureFactoryRegistered();
     }
 
     @Override
@@ -32,12 +34,16 @@ public class UDPGameServer implements UDPServerNetworkEventReceiver {
         assert (s == server);
         if (clientIDs.containsKey(new Pair<>(clientAddress, clientPort))) {
             int id = clientIDs.get(new Pair<>(clientAddress, clientPort));
-            InputPacket packet = (InputPacket) MagicConstDeserializer.deserialize(packetData, 0, packetData.length);
-            synchronized (lock) {
-                if (!inputs.containsKey(id)) {
-                    inputs.put(id, new ArrayList<>());
+            ByteSerializable packet = MagicConstDeserializer.deserialize(packetData, 0, packetData.length);
+            if (packet instanceof InputPacket) {
+                synchronized (lock) {
+                    if (!inputs.containsKey(id)) {
+                        inputs.put(id, new ArrayList<>());
+                    }
+                    inputs.get(id).add((InputPacket) packet);
                 }
-                inputs.get(id).add(packet);
+            } else if (packet instanceof RespawnRequestPacket) {
+                controller.respawn(id);
             }
         } else {
             int id = nextID++;
