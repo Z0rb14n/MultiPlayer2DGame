@@ -24,6 +24,10 @@ public class RotatedTriangleRenderer implements RendererBehaviour {
         this.fill = fill;
     }
 
+    public void setColor(Color c) {
+        this.color = c;
+    }
+
     @Override
     public void render(Graphics2D g) {
         RotatedTriangle triangle = (RotatedTriangle) parent.getBehaviour(PhysicsBehaviour.class).getTranslatedShape();

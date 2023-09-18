@@ -5,7 +5,6 @@ import game.GameLogger;
 import net.TCPClient;
 import net.TCPServer;
 import net.TCPServerNetworkEventReceiver;
-import physics.Vec2D;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -35,7 +34,7 @@ public class TCPGameServer implements TCPServerNetworkEventReceiver {
         clientIDs.put(c,id);
         InitGameInfoPacket packet = new InitGameInfoPacket(id, ids2);
         c.writePacket(packet);
-        controller.addVehicle(new Vec2D(100,100), id);
+        controller.addVehicle(id);
     }
 
     @Override

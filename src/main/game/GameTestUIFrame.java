@@ -2,7 +2,6 @@ package game;
 
 import engine.BoxRenderer;
 import engine.GameObject;
-import physics.Vec2D;
 
 import javax.swing.*;
 import java.awt.*;
@@ -47,7 +46,7 @@ class GameTestUIFrame extends JFrame {
         MainPanel() {
             super();
             setBackground(Color.WHITE);
-            player = controller.addVehicle(new Vec2D(100,100), 0);
+            player = controller.addVehicle(0);
 
             for (GameObject gameObject : GameController.getInstance().getBoundingBoxes()) {
                 BoxRenderer renderer = new BoxRenderer(gameObject, Color.BLUE, true);
@@ -83,7 +82,7 @@ class GameTestUIFrame extends JFrame {
         @Override
         public void paintComponent(Graphics g) {
             super.paintComponent(g);
-            GameControllerRenderer.render((Graphics2D) g);
+            GameControllerRenderer.render((Graphics2D) g, 0);
         }
 
         private void handleInputs() {

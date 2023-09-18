@@ -13,6 +13,7 @@ import java.awt.*;
 public class VehicleObject extends GameObject implements GameObjectBehaviour {
     public static int VEHICLE_COLLISION_MASK = 0b11;
     private final RotatedTriangle triangle;
+    private final RotatedTriangleRenderer renderer;
     private final PhysicsBehaviour behaviour;
     private static final float maxSpeed = 300;
     private static final Vec2D[] vertices = new Vec2D[3];
@@ -34,7 +35,7 @@ public class VehicleObject extends GameObject implements GameObjectBehaviour {
         behaviour = new PhysicsBehaviour(this,engine,triangle,false);
         behaviour.setCollisionMask(VEHICLE_COLLISION_MASK);
         addBehaviour(behaviour);
-        RotatedTriangleRenderer renderer = new RotatedTriangleRenderer(this, Color.RED, true);
+        renderer = new RotatedTriangleRenderer(this, dead ? Color.MAGENTA : Color.RED, true);
         addBehaviour(renderer);
         addBehaviour(this);
         this.id = id;
@@ -79,6 +80,7 @@ public class VehicleObject extends GameObject implements GameObjectBehaviour {
 
     public void setDead(boolean dead) {
         this.dead = dead;
+        renderer.setColor(dead ? Color.MAGENTA : Color.RED);
     }
 
     @Override

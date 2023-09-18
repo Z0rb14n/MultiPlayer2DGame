@@ -43,6 +43,16 @@ public class GameController {
         createBoundingBoxes();
     }
 
+    public VehicleObject addVehicle(int id) {
+        float randX = random.nextFloat() * (GAME_WIDTH-50) + 50;
+        float randY = random.nextFloat() * (GAME_HEIGHT-50) + 50;
+        Vec2D pos = new Vec2D(randX, randY);
+        VehicleObject v = new VehicleObject(engine, pos, id);
+        hierarchy.addObject(v);
+        vehicles.put(id,v);
+        return v;
+    }
+
     public VehicleObject addVehicle(Vec2D pos, int id) {
         VehicleObject v = new VehicleObject(engine, pos, id);
         hierarchy.addObject(v);

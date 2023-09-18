@@ -6,7 +6,6 @@ import net.ByteSerializable;
 import net.MagicConstDeserializer;
 import net.udp.UDPServer;
 import net.udp.UDPServerNetworkEventReceiver;
-import physics.Vec2D;
 import util.Pair;
 
 import java.io.IOException;
@@ -57,7 +56,7 @@ public class UDPGameServer implements UDPServerNetworkEventReceiver {
             InitGameInfoPacket packet = new InitGameInfoPacket(id, ids2);
             server.writePacket(packet, clientAddress, clientPort);
             System.out.println("added id: " + id);
-            controller.addVehicle(new Vec2D(100,100), id);
+            controller.addVehicle(id);
         }
     }
 
