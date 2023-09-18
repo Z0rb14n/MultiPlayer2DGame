@@ -14,6 +14,7 @@ import physics.shape.RotatedTriangle;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Random;
 
 /**
  * Represents the game controller
@@ -28,6 +29,7 @@ public class GameController {
     private final ArrayList<BallObject> balls = new ArrayList<>();
     private final ArrayList<GameObject> boundingBoxes = new ArrayList<>();
     private final SceneHierarchy hierarchy = new SceneHierarchy();
+    private final Random random = new Random();
     private static int GAME_SPEED = 3;
     private static GameController singleton;
     public static GameController getInstance() {
@@ -183,6 +185,9 @@ public class GameController {
         if (!object.isDead()) return;
         System.out.println("is dead.");
         object.setDead(false);
+        float randX = random.nextFloat() * (GAME_WIDTH-50) + 50;
+        float randY = random.nextFloat() * (GAME_HEIGHT-50) + 50;
+        object.setPosition(new Vec2D(randX, randY));
         object.getBehaviour(PhysicsBehaviour.class).setStationary(false);
         object.getBehaviour(PhysicsBehaviour.class).setEnabled(true);
         System.out.println("Respawn player " + id);

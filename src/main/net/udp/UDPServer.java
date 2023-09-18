@@ -10,7 +10,6 @@ import java.net.*;
 import java.util.*;
 
 public class UDPServer implements Runnable {
-
     private final ArrayList<UDPServerNetworkEventReceiver> networkEventReceivers = new ArrayList<>(1);
     private volatile Thread thread;
     private final DatagramSocket server;
@@ -81,6 +80,7 @@ public class UDPServer implements Runnable {
             DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
             try {
                 prev = System.currentTimeMillis();
+                long current = new Date().getTime();
                 server.receive(packet);
                 GameLogger.getDefault().log("Time since prev: " + (System.currentTimeMillis() - prev) + " ms", "NETWORK");
                 byte[] data = new byte[packet.getLength()];
@@ -89,10 +89,10 @@ public class UDPServer implements Runnable {
                 for (UDPServerNetworkEventReceiver networkEventReceiver : networkEventReceivers)
                     networkEventReceiver.onReceiveData(this, data, packet.getAddress(), packet.getPort());
                 if (clients.containsKey(new Pair<>(packet.getAddress(), packet.getPort()))) {
-                    clients.put(new Pair<>(packet.getAddress(), packet.getPort()), new Date().getTime());
+                    clients.put(new Pair<>(packet.getAddress(), packet.getPort()), current);
                 } else {
                     synchronized (clientsLock) {
-                        clients.put(new Pair<>(packet.getAddress(), packet.getPort()), new Date().getTime());
+                        clients.put(new Pair<>(packet.getAddress(), packet.getPort()), current);
                     }
                 }
             } catch (SocketTimeoutException ignored) {
@@ -112,6 +112,9 @@ public class UDPServer implements Runnable {
                 Pair<InetAddress, Integer> client = entry.getKey();
                 long lastActivity = entry.getValue();
                 if (new Date().getTime() - lastActivity > inactivityDelay) {
+                    for (UDPServerNetworkEventReceiver receiver : networkEventReceivers) {
+                        receiver.onInactive(this, client.first, client.second, entry.getValue());
+                    }
                     iterator.remove();
                 } else {
                     DatagramPacket udpPacket = new DatagramPacket(data, data.length, client.first, client.second);

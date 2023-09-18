@@ -61,16 +61,15 @@ public class UDPGameServer implements UDPServerNetworkEventReceiver {
         }
     }
 
-    /*
     @Override
-    public void removeClientEvent(NetworkServer s, NetworkClient c) {
-        assert(s == server);
-        int id = clientIDs.get(c);
+    public void onInactive(UDPServer server, InetAddress clientAddress, int clientPort, long lastReceived) {
+        Pair<InetAddress, Integer> clientData = new Pair<>(clientAddress, clientPort);
+        Integer id = clientIDs.get(clientData);
+        if (id == null) return;
         controller.removeVehicle(id);
+        clientIDs.remove(clientData);
         clients.remove(id);
-        clientIDs.remove(c);
     }
-    */
 
     private long lastPacket = 0;
 
