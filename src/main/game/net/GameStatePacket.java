@@ -67,7 +67,7 @@ public class GameStatePacket implements ByteSerializable {
             if (len < 2) return null;
             int ballsLength = ByteSerializable.readShort(index, data);
             if (ballsLength < 0) System.err.println("Invalid balls length: " + ballsLength);
-            if (ballsLength > 100) System.out.println("Prepare for Heap Space error: " + ballsLength);
+            //if (ballsLength > 100) System.out.println("Prepare for Heap Space error: " + ballsLength);
             BallPacket[] balls = new BallPacket[ballsLength];
             index += 2;
             int remainingLen = len - 2;
