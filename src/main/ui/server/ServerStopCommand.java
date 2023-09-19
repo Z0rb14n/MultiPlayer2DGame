@@ -1,5 +1,7 @@
 package ui.server;
 
+import game.GameLogger;
+
 class ServerStopCommand implements ServerCommand {
     public ServerStopCommand() {
     }
@@ -7,7 +9,7 @@ class ServerStopCommand implements ServerCommand {
     @Override
     public void call(String[] args) {
         if (args.length > 0) {
-            System.out.println("Ignored arguments in stop command: " + String.join(" ",args));
+            GameLogger.getDefault().log("Ignored arguments in stop command: " + String.join(" ",args), GameLogger.Level.WARNING);
         }
         ServerCLI.getInstance().stop();
         System.exit(0);

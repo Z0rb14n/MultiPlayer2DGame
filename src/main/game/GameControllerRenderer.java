@@ -17,7 +17,7 @@ public class GameControllerRenderer {
         if (centerVehicle != -1) {
             VehicleObject object = GameController.getInstance().getVehicle(centerVehicle);
             if (object == null) {
-                GameLogger.getDefault().log("Can't locate this vehicle to render!", "IGNORE");
+                GameLogger.getDefault().log("Can't locate this vehicle to render!", GameLogger.Category.UI);
             } else {
                 Vec2D position = object.getPosition();
                 float xMin = 50 + screenWidth/2;

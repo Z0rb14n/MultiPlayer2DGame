@@ -82,7 +82,7 @@ public class UDPServer implements Runnable {
                 prev = System.currentTimeMillis();
                 long current = new Date().getTime();
                 server.receive(packet);
-                GameLogger.getDefault().log("Time since prev: " + (System.currentTimeMillis() - prev) + " ms", "NETWORK");
+                GameLogger.getDefault().log("Time since prev: " + (System.currentTimeMillis() - prev) + " ms", GameLogger.Category.NETWORK);
                 byte[] data = new byte[packet.getLength()];
                 System.arraycopy(packet.getData(), packet.getOffset(), data, 0, packet.getLength());
                 packets.add(new Pair<>(data, new Pair<>(packet.getAddress(), packet.getPort())));

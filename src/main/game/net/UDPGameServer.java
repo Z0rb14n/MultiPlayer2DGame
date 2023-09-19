@@ -55,7 +55,7 @@ public class UDPGameServer implements UDPServerNetworkEventReceiver {
             clientIDs.put(new Pair<>(clientAddress, clientPort), id);
             InitGameInfoPacket packet = new InitGameInfoPacket(id, ids2);
             server.writePacket(packet, clientAddress, clientPort);
-            System.out.println("added id: " + id);
+            GameLogger.getDefault().log("Added new player: " + id, GameLogger.Category.GAME);
             controller.addVehicle(id);
         }
     }
@@ -78,7 +78,7 @@ public class UDPGameServer implements UDPServerNetworkEventReceiver {
         controller.processMovementInputs();
         server.writePacket(controller.asGameStatePacket());
         long diff = System.currentTimeMillis() - lastPacket;
-        GameLogger.getDefault().log("Packet Diff: " + diff, "PERFORMANCE");
+        GameLogger.getDefault().log("Packet Diff: " + diff, GameLogger.Category.PERFORMANCE);
         lastPacket = System.currentTimeMillis();
     }
 

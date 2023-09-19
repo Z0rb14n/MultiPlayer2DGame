@@ -1,5 +1,6 @@
 package net.udp;
 
+import game.GameLogger;
 import net.ByteSerializable;
 import net.TCPClientNetworkEventReceiver;
 import net.MagicConstDeserializer;
@@ -28,7 +29,7 @@ public class UDPClient implements Runnable {
         socket.setSoTimeout(timeout);
         thread = new Thread(this, "ClientThread");
         thread.start();
-        System.out.println(this.socket.getPort() + "," + this.socket.getLocalPort());
+        GameLogger.getDefault().log("Created UDP socket: " + this.socket.getPort() + "," + this.socket.getLocalPort(), GameLogger.Category.NETWORK);
     }
 
     public UDPClient(String host, int hostPort, int clientPort, int timeout) throws IOException {
@@ -93,7 +94,7 @@ public class UDPClient implements Runnable {
                     for (UDPClientNetworkEventReceiver networkEventReceiver : networkEventReceivers)
                         networkEventReceiver.dataReceivedEvent(this, data);
                 } catch (SocketTimeoutException ignored) {
-                    System.err.println("UDPClient receive Socket timeout");
+                    GameLogger.getDefault().log("UDPClient receive Socket timeout", GameLogger.Level.WARNING);
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }

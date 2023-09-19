@@ -1,6 +1,7 @@
 package game.net;
 
 import game.BallObject;
+import game.GameLogger;
 import game.VehicleObject;
 import net.ByteSerializable;
 import net.ByteSerializableFactory;
@@ -66,8 +67,10 @@ public class GameStatePacket implements ByteSerializable {
         public GameStatePacket deserialize(byte[] data, int index, int len) {
             if (len < 2) return null;
             int ballsLength = ByteSerializable.readShort(index, data);
-            if (ballsLength < 0) System.err.println("Invalid balls length: " + ballsLength);
-            //if (ballsLength > 100) System.out.println("Prepare for Heap Space error: " + ballsLength);
+            if (ballsLength < 0 || (len / BallPacket.PACKET_LEN) < ballsLength) {
+                GameLogger.getDefault().log("Invalid balls length: " + ballsLength, GameLogger.Level.ERROR);
+                throw new RuntimeException("Invalid balls length: " + ballsLength);
+            }
             BallPacket[] balls = new BallPacket[ballsLength];
             index += 2;
             int remainingLen = len - 2;
@@ -79,7 +82,10 @@ public class GameStatePacket implements ByteSerializable {
             }
             if (remainingLen < 2) return null;
             int vehiclesLength = ByteSerializable.readShort(index, data);
-            if (vehiclesLength > 100) System.out.println("Prepare for Heap Space error: " + vehiclesLength);
+            if (vehiclesLength < 0 || (len / VehiclePacket.PACKET_LEN) < vehiclesLength) {
+                GameLogger.getDefault().log("Invalid vehicles length: " + vehiclesLength, GameLogger.Level.ERROR);
+                throw new RuntimeException("Invalid vehicles length: " + vehiclesLength);
+            }
             VehiclePacket[] vehicles = new VehiclePacket[vehiclesLength];
             index += 2;
             remainingLen -= 2;

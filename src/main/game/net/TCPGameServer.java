@@ -54,7 +54,7 @@ public class TCPGameServer implements TCPServerNetworkEventReceiver {
         controller.processMovementInputs();
         server.writePacket(controller.asGameStatePacket());
         long diff = System.currentTimeMillis() - lastPacket;
-        GameLogger.getDefault().log("Packet Diff: " + diff, "PERFORMANCE");
+        GameLogger.getDefault().log("Packet Diff: " + diff, GameLogger.Category.PERFORMANCE);
         lastPacket = System.currentTimeMillis();
     }
 

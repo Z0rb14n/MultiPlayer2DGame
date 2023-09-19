@@ -89,7 +89,7 @@ public class Vec2D implements Serializable {
     public Vec2D normalize() {
         float mag = mag();
         if (mag == 0) {
-            GameLogger.getDefault().log("Warning: Normalizing zero vector; returning zero vector","VEC2D_DEBUG");
+            GameLogger.getDefault().log("Warning: Normalizing zero vector; returning zero vector", GameLogger.Category.VEC2D_DEBUG);
             return ZERO;
         }
         return new Vec2D(x/mag,y/mag);

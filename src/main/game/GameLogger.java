@@ -2,6 +2,8 @@ package game;
 
 import java.util.HashMap;
 
+import static game.GameLogger.Category.*;
+
 public class GameLogger {
     private static GameLogger defaultInstance;
 
@@ -12,22 +14,20 @@ public class GameLogger {
         return defaultInstance;
     }
 
-    private final HashMap<String, Level> typeLevels = new HashMap<>();
-
+    public final HashMap<Category, Level> typeLevels = new HashMap<>();
     {
-        typeLevels.put("PHYSICS", Level.WARNING);
-        typeLevels.put("VEHICLE_DEBUG", Level.IGNORE);
-        typeLevels.put("VEC2D_DEBUG", Level.IGNORE);
-        typeLevels.put("PERFORMANCE", Level.IGNORE);
-        typeLevels.put("COLLISION", Level.WARNING);
-        typeLevels.put("INPUT", Level.WARNING);
-        typeLevels.put("RENDER", Level.WARNING);
-        typeLevels.put("GAME", Level.WARNING);
-        typeLevels.put("NETWORK", Level.IGNORE);
-        typeLevels.put("AUDIO", Level.WARNING);
-        typeLevels.put("UI", Level.WARNING);
-        typeLevels.put("DEBUG", Level.INFO);
-        typeLevels.put("IGNORE", Level.IGNORE);
+        typeLevels.put(PHYSICS, Level.WARNING);
+        typeLevels.put(VEHICLE_DEBUG, Level.IGNORE);
+        typeLevels.put(VEC2D_DEBUG, Level.IGNORE);
+        typeLevels.put(PERFORMANCE, Level.IGNORE);
+        typeLevels.put(COLLISION, Level.WARNING);
+        typeLevels.put(INPUT, Level.WARNING);
+        typeLevels.put(RENDER, Level.WARNING);
+        typeLevels.put(GAME, Level.WARNING);
+        typeLevels.put(NETWORK, Level.IGNORE);
+        typeLevels.put(AUDIO, Level.WARNING);
+        typeLevels.put(UI, Level.WARNING);
+        typeLevels.put(DEBUG, Level.INFO);
     }
 
     private Level defaultLevel = Level.INFO;
@@ -35,11 +35,7 @@ public class GameLogger {
     public GameLogger() {
     }
 
-    public void setLevel(String tag, Level level) {
-        typeLevels.put(tag, level);
-    }
-
-    private void log(String str, Level level) {
+    public void log(String str, Level level) {
         switch (level) {
             case IGNORE:
                 return;
@@ -58,9 +54,9 @@ public class GameLogger {
         log("[DEFAULT]" + str, defaultLevel);
     }
 
-    public void log(String str, String tag) {
-        if (typeLevels.containsKey(tag)) log("[" + tag + "]" + str, typeLevels.get(tag));
-        else log("[" + tag + "]" + str, defaultLevel);
+    public void log(String str, Category category) {
+        if (typeLevels.containsKey(category)) log("[" + category + "]" + str, typeLevels.get(category));
+        else log("[" + category + "]" + str, defaultLevel);
     }
 
     public enum Level {
@@ -68,5 +64,9 @@ public class GameLogger {
         WARNING,
         ERROR,
         IGNORE
+    }
+
+    public enum Category {
+        PHYSICS, VEHICLE_DEBUG, VEC2D_DEBUG, PERFORMANCE, COLLISION, INPUT, RENDER, GAME, NETWORK, AUDIO, UI, DEBUG
     }
 }

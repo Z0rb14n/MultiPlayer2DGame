@@ -62,10 +62,10 @@ class GameTestUIFrame extends JFrame {
             long start = System.nanoTime();
             controller.update();
             long physUpdate = System.nanoTime();
-            GameLogger.getDefault().log("Physics update took " + (physUpdate - start) / 1000000f + "ms","PERFORMANCE");
+            GameLogger.getDefault().log("Physics update took " + (physUpdate - start) / 1000000f + "ms", GameLogger.Category.PERFORMANCE);
             repaint();
             long render = System.nanoTime();
-            GameLogger.getDefault().log("Render took " + (render - physUpdate) / 1000000f + "ms","PERFORMANCE");
+            GameLogger.getDefault().log("Render took " + (render - physUpdate) / 1000000f + "ms", GameLogger.Category.PERFORMANCE);
         }
 
         private void handleAction(Action pop) {

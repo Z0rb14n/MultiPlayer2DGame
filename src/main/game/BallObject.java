@@ -52,7 +52,7 @@ public class BallObject extends GameObject implements GameObjectBehaviour {
     public void physicsUpdate() {
         Vec2D pos = getPosition();
         if (pos.getX() < 10 || pos.getX() > GameController.GAME_WIDTH-10 || pos.getY() < 10 || pos.getY() > GameController.GAME_HEIGHT-10) {
-            GameLogger.getDefault().log("BALL OUT OF BOUNDS: " + pos,"IGNORE");
+            GameLogger.getDefault().log("BALL OUT OF BOUNDS: " + pos, GameLogger.Level.IGNORE);
         }
     }
 

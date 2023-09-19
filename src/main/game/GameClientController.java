@@ -29,28 +29,28 @@ public class GameClientController implements UDPClientNetworkEventReceiver {
     private final ArrayList<Integer> currentPlayers = new ArrayList<>();
     public NetworkInstantiationResult connect(String ip) {
         try {
-            GameLogger.getDefault().log("Starting instantiation of client...", "NETWORK");
+            GameLogger.getDefault().log("Starting instantiation of client...", GameLogger.Category.NETWORK);
             client = new UDPClient(ip, NetworkConstants.PORT);
-            GameLogger.getDefault().log("Client instantiated.", "NETWORK");
+            GameLogger.getDefault().log("Client instantiated.", GameLogger.Category.NETWORK);
             client.writePacket(new ClientConnectPacket("funny"));
             InitGameInfoPacket.ensureFactoryInitialized();
             GameStatePacket.registerFactory();
             ByteSerializable packet = spinReadPacket(500);
             if (packet == null) {
-                GameLogger.getDefault().log("Packet was null.", "NETWORK");
+                GameLogger.getDefault().log("Packet was null.", GameLogger.Category.NETWORK);
                 client.stop();
                 client = null;
                 return NetworkInstantiationResult.FAILURE;
             }
             if (!(packet instanceof InitGameInfoPacket)) {
                 // what?
-                GameLogger.getDefault().log("Packet was not InitGameInfoPacket.", "NETWORK");
+                GameLogger.getDefault().log("Packet was not InitGameInfoPacket.", GameLogger.Category.NETWORK);
                 client.stop();
                 client = null;
                 return NetworkInstantiationResult.FAILURE;
             }
             InitGameInfoPacket initPacket = (InitGameInfoPacket) packet;
-            GameLogger.getDefault().log("Received InitGameInfoPacket.", "NETWORK");
+            GameLogger.getDefault().log("Received InitGameInfoPacket.", GameLogger.Category.NETWORK);
             playerNumber = initPacket.getYourPlayerID();
             for (int i = 0; i < initPacket.getActivePlayers().length; i++) {
                 currentPlayers.add(i);
@@ -59,7 +59,7 @@ public class GameClientController implements UDPClientNetworkEventReceiver {
             return NetworkInstantiationResult.SUCCESS;
         } catch (SocketException ex) {
             if (ex.getMessage().contains("already connected")) {
-                GameLogger.getDefault().log("Already connected to server.", "NETWORK");
+                GameLogger.getDefault().log("Already connected to server.", GameLogger.Category.NETWORK);
                 return NetworkInstantiationResult.ALREADY_CONNECTED;
             } else if (ex.getMessage().contains("timed out")) {
                 return NetworkInstantiationResult.TIMEOUT;
@@ -103,44 +103,15 @@ public class GameClientController implements UDPClientNetworkEventReceiver {
 
     @Override
     public void dataReceivedEvent(UDPClient c, byte[] data) {
-        GameLogger.getDefault().log("Client::dataReceivedEvent", "NETWORK");
+        GameLogger.getDefault().log("Client::dataReceivedEvent", GameLogger.Category.NETWORK);
         ByteSerializable packet = c.readPacket();
         if (packet == null) return;
-        GameLogger.getDefault().log("Packet received: " + packet, "NETWORK");
+        GameLogger.getDefault().log("Packet received: " + packet, GameLogger.Category.NETWORK);
         if (packet instanceof GameStatePacket) {
             GameStatePacket gameStatePacket = (GameStatePacket) packet;
             GameFrame.getInstance().updatePacket(gameStatePacket);
         }
     }
-
-    /*
-
-    @Override
-    public void disconnectEvent(NetworkClient c) {
-        System.out.println("Client::disconnectEvent");
-        ArrayList<ByteSerializable> packets = new ArrayList<>();
-        ByteSerializable packet;
-        while ((packet = c.readPacket()) != null) {
-            packets.add(packet);
-        }
-        System.out.println("Packets received on disconnect: " + packets.size());
-
-        for (ByteSerializable p : packets) {
-            if (p instanceof GameStatePacket) {
-                GameStatePacket gameStatePacket = (GameStatePacket) p;
-                GameController.getInstance().updateFromPacket(gameStatePacket);
-                GameFrame.getInstance().updatePacket(gameStatePacket);
-            }
-        }
-        GameFrame.getInstance().endGame();
-    }
-
-    @Override
-    public void endOfStreamEvent(NetworkClient c) {
-        System.out.println("Client::endOfStreamEvent");
-        GameFrame.getInstance().endGame();
-    }
-    */
 
     public enum NetworkInstantiationResult {
         SUCCESS, FAILURE, TIMEOUT, ALREADY_CONNECTED

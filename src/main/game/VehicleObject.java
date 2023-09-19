@@ -88,7 +88,7 @@ public class VehicleObject extends GameObject implements GameObjectBehaviour {
         GameObject other = target.getParentObject();
         if (other == this) {
             other = src.getParentObject();
-            System.out.println("lol -- VEHICLE OBJECT ON COLLISION FUNNY");
+            GameLogger.getDefault().log("Vehicle Object Collision src/target swap", GameLogger.Category.COLLISION);
         }
 
         if (other instanceof BallObject) {
@@ -96,7 +96,7 @@ public class VehicleObject extends GameObject implements GameObjectBehaviour {
             if (ball.getId() == id) {
                 return;
             }
-            System.out.println("vehicle collided with ball");
+            GameLogger.getDefault().log("Vehicle collided with ball", GameLogger.Category.COLLISION);
             ball.destroy();
             GameController.getInstance().onDeath(this, ball.getId());
         }

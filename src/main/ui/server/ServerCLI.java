@@ -21,7 +21,7 @@ public class ServerCLI {
     private ServerCLI() {
         try {
             server = new UDPGameServer();
-            System.out.println("Server started on port " + NetworkConstants.PORT);
+            GameLogger.getDefault().log("Server started on port " + NetworkConstants.PORT, GameLogger.Category.GAME);
         } catch (IOException e) {
             e.printStackTrace();
             throw new RuntimeException(e);

@@ -189,18 +189,15 @@ public class GameController {
 
     public void respawn(int id) {
         VehicleObject object = vehicles.get(id);
-        System.out.println("Respawning.");
         if (object == null) return;
-        System.out.println("is not null.");
         if (!object.isDead()) return;
-        System.out.println("is dead.");
         object.setDead(false);
         float randX = random.nextFloat() * (GAME_WIDTH-50) + 50;
         float randY = random.nextFloat() * (GAME_HEIGHT-50) + 50;
         object.setPosition(new Vec2D(randX, randY));
         object.getBehaviour(PhysicsBehaviour.class).setStationary(false);
         object.getBehaviour(PhysicsBehaviour.class).setEnabled(true);
-        System.out.println("Respawn player " + id);
+        GameLogger.getDefault().log("Respawn player " + id, GameLogger.Category.GAME);
 
     }
 
@@ -208,7 +205,7 @@ public class GameController {
         dead.setDead(true);
         dead.getBehaviour(PhysicsBehaviour.class).setStationary(true);
         dead.getBehaviour(PhysicsBehaviour.class).setEnabled(false);
-        System.out.println(killer + " killed player " + dead.getId());
+        GameLogger.getDefault().log(killer + " killed player " + dead.getId(), GameLogger.Category.GAME);
     }
 
     public void updateFromPacket(GameStatePacket packet) {

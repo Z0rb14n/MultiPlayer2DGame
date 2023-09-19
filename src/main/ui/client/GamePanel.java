@@ -47,10 +47,10 @@ public class GamePanel extends JPanel implements KeyListener {
             }
         }
         long physUpdate = System.nanoTime();
-        GameLogger.getDefault().log("From Packet update took " + (physUpdate - start) / 1000000f + "ms","PERFORMANCE");
+        GameLogger.getDefault().log("From Packet update took " + (physUpdate - start) / 1000000f + "ms", GameLogger.Category.PERFORMANCE);
         repaint();
         long render = System.nanoTime();
-        GameLogger.getDefault().log("Render took " + (render - physUpdate) / 1000000f + "ms","PERFORMANCE");
+        GameLogger.getDefault().log("Render took " + (render - physUpdate) / 1000000f + "ms", GameLogger.Category.PERFORMANCE);
     }
 
     private long lastUpdate = 0;
@@ -60,7 +60,7 @@ public class GamePanel extends JPanel implements KeyListener {
             if (packet != null) {
                 packetQueue.add(packet);
                 long diff = System.nanoTime() - lastUpdate;
-                GameLogger.getDefault().log("Packet diff: " + diff / 1000000f + "ms", "PERFORMANCE");
+                GameLogger.getDefault().log("Packet diff: " + diff / 1000000f + "ms", GameLogger.Category.PERFORMANCE);
                 lastUpdate = System.nanoTime();
             }
         }
@@ -75,7 +75,7 @@ public class GamePanel extends JPanel implements KeyListener {
     private void handleInputs() {
         boolean isEmpty = queuedActions.isEmpty();
         if (hasRespawnQueued) {
-            System.out.println("Sending respawn.");
+            GameLogger.getDefault().log("Sending respawn", GameLogger.Category.GAME);
             GameClientController.getInstance().sendPacket(new RespawnRequestPacket());
         }
         hasRespawnQueued = false;

@@ -30,7 +30,6 @@ class ConnectionPanel extends JPanel {
         ipEnterButton.setFont(font);
         ipEnterButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         ipEnterButton.addActionListener(e -> {
-            System.out.print(ipBox.getText());
             attemptLoadClient(ipBox.getText());
         });
 
