@@ -1,6 +1,5 @@
 package game;
 
-import engine.BoxRenderer;
 import engine.GameObject;
 
 import javax.swing.*;
@@ -48,9 +47,9 @@ class GameTestUIFrame extends JFrame {
             setBackground(Color.WHITE);
             player = controller.addVehicle(0);
 
-            for (GameObject gameObject : GameController.getInstance().getBoundingBoxes()) {
-                BoxRenderer renderer = new BoxRenderer(gameObject, Color.BLUE, true);
-                gameObject.addBehaviour(renderer);
+            GameObject[] map = GameController.getInstance().loadMap("/maps/NewMap.txt");
+            for (GameObject gameObject : map) {
+                GameControllerRenderer.addRenderer(gameObject);
             }
         }
 

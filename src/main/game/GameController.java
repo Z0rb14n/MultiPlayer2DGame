@@ -8,7 +8,6 @@ import game.net.InputPacket;
 import physics.PhysicsEngine;
 import physics.Vec2D;
 import physics.broad.SpatialGrid;
-import physics.shape.AxisAlignedBoundingBox;
 import physics.shape.RotatedTriangle;
 
 import java.util.ArrayList;
@@ -20,14 +19,12 @@ import java.util.Random;
  * Represents the game controller
  */
 public class GameController {
-    public static int VEHICLE_COLLISION_MASK = 0b10;
     public static final int GAME_WIDTH = 2000;
     public static final int GAME_HEIGHT = 2000;
     private final PhysicsEngine engine;
     private final HashMap<Integer, VehicleObject> vehicles = new HashMap<>();
     private final HashMap<Integer, HashSet<GameInput>> playerInputs = new HashMap<>();
     private final ArrayList<BallObject> balls = new ArrayList<>();
-    private final ArrayList<GameObject> boundingBoxes = new ArrayList<>();
     private final SceneHierarchy hierarchy = new SceneHierarchy();
     private final Random random = new Random();
     private static int GAME_SPEED = 3;
@@ -40,7 +37,6 @@ public class GameController {
     private GameController() {
         //engine = new PhysicsEngine(new Vec2D(GAME_WIDTH+100, GAME_HEIGHT+100), new Vec2D(-50,-50));
         engine = new PhysicsEngine(new SpatialGrid<>(new Vec2D(50,50)));
-        createBoundingBoxes();
     }
 
     public VehicleObject addVehicle(int id) {
@@ -81,23 +77,25 @@ public class GameController {
         vehicles.remove(id);
     }
 
-    private GameObject createBoundingBox(AxisAlignedBoundingBox box) {
-        GameObject gameObject = new GameObject();
-        PhysicsBehaviour behaviour = new PhysicsBehaviour(gameObject,engine,box,true);
-        gameObject.addBehaviour(behaviour);
-        boundingBoxes.add(gameObject);
-        return gameObject;
-    }
-
-    private void createBoundingBoxes() {
-        AxisAlignedBoundingBox top = new AxisAlignedBoundingBox(new Vec2D(-100, -100), new Vec2D(GAME_WIDTH + 100, 20));
-        AxisAlignedBoundingBox bot = new AxisAlignedBoundingBox(new Vec2D(-100, GAME_HEIGHT - 20), new Vec2D(GAME_WIDTH + 100, GAME_HEIGHT + 100));
-        AxisAlignedBoundingBox left = new AxisAlignedBoundingBox(new Vec2D(-100, -100), new Vec2D(20, GAME_HEIGHT + 100));
-        AxisAlignedBoundingBox right = new AxisAlignedBoundingBox(new Vec2D(GAME_WIDTH - 20, -100), new Vec2D(GAME_WIDTH + 100, GAME_HEIGHT + 100));
-        hierarchy.addObject(createBoundingBox(top));
-        hierarchy.addObject(createBoundingBox(bot));
-        hierarchy.addObject(createBoundingBox(left));
-        hierarchy.addObject(createBoundingBox(right));
+    public GameObject[] loadMap(String file) {
+        try {
+            GameMap map = MapLoader.getFromFile(file);
+            if (map == null) return null;
+            GameObject[] objects = new GameObject[map.shapes.length];
+            for (int i = 0; i < objects.length; i++) {
+                GameObject go = new GameObject();
+                PhysicsBehaviour behaviour = new PhysicsBehaviour(go, engine, map.shapes[i], true);
+                go.addBehaviour(behaviour);
+                objects[i] = go;
+            }
+            for (GameObject go : objects) {
+                hierarchy.addObject(go);
+            }
+            return objects;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return null;
+        }
     }
 
     public void createBall(VehicleObject object, int id) {
@@ -156,7 +154,9 @@ public class GameController {
             if (hasShoot) {
                 createBall(vehicle, id);
             }
-            // TODO: reload
+            if (hasReload) {
+                // TODO: reload
+            }
         }
     }
 
@@ -243,8 +243,5 @@ public class GameController {
 
     PhysicsEngine getEngine() {
         return engine;
-    }
-    public ArrayList<GameObject> getBoundingBoxes() {
-        return boundingBoxes;
     }
 }

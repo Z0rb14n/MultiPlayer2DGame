@@ -1,7 +1,6 @@
 package ui.client;
 
-import engine.BoxRenderer;
-import engine.GameObject;
+import engine.*;
 import game.*;
 import game.net.GameStatePacket;
 import game.net.InputPacket;
@@ -27,9 +26,9 @@ public class GamePanel extends JPanel implements KeyListener {
         setBackground(Color.WHITE);
         addKeyListener(this);
 
-        for (GameObject gameObject : GameController.getInstance().getBoundingBoxes()) {
-            BoxRenderer renderer = new BoxRenderer(gameObject, Color.BLUE, true);
-            gameObject.addBehaviour(renderer);
+        GameObject[] map = GameController.getInstance().loadMap("/maps/NewMap.txt");
+        for (GameObject gameObject : map) {
+            GameControllerRenderer.addRenderer(gameObject);
         }
     }
 
@@ -42,7 +41,7 @@ public class GamePanel extends JPanel implements KeyListener {
         long start = System.nanoTime();
 
         synchronized (lock) {
-            while (packetQueue.size() > 0) {
+            while (!packetQueue.isEmpty()) {
                 controller.updateFromPacket(packetQueue.poll());
             }
         }

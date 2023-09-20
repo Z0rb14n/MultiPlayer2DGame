@@ -26,6 +26,7 @@ public class UDPGameServer implements UDPServerNetworkEventReceiver {
         server.addNetworkEventReceiver(this);
         InputPacket.ensureFactoryRegistered();
         RespawnRequestPacket.ensureFactoryRegistered();
+        controller.loadMap("/maps/NewMap.txt");
     }
 
     @Override

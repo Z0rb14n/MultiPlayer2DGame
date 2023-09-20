@@ -38,8 +38,9 @@ public class CircleRenderer implements RendererBehaviour {
 
     @Override
     public void render(Graphics2D g) {
-        Vec2D pos = parent.getPosition();
-        float radius = ((Circle) parent.getBehaviour(PhysicsBehaviour.class).getTranslatedShape()).getRadius();
+        Circle shape = (Circle) parent.getBehaviour(PhysicsBehaviour.class).getTranslatedShape();
+        Vec2D pos = shape.getCenter();
+        float radius = shape.getRadius();
         g.setColor(color);
         if (fill) g.fillOval((int)(pos.getX() - radius), (int)(pos.getY() - radius), (int)(radius * 2), (int)(radius * 2));
         else g.drawOval((int)(pos.getX() - radius), (int)(pos.getY() - radius), (int)(radius * 2), (int)(radius * 2));

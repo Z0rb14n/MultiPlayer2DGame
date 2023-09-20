@@ -1,7 +1,8 @@
 package game;
 
-import engine.Time;
+import engine.*;
 import physics.Vec2D;
+import physics.shape.*;
 
 import java.awt.*;
 
@@ -40,5 +41,26 @@ public class GameControllerRenderer {
             }
         }
         Time.lastRenderNano = System.nanoTime();
+    }
+
+    public static void addRenderer(GameObject gameObject) {
+        PhysicsBehaviour behaviour = gameObject.getBehaviour(PhysicsBehaviour.class);
+        if (behaviour == null) return;
+        if (behaviour.getShape() instanceof AxisAlignedBoundingBox) {
+            BoxRenderer renderer = new BoxRenderer(gameObject, Color.BLUE, true);
+            gameObject.addBehaviour(renderer);
+        } else if (behaviour.getShape() instanceof Circle) {
+            CircleRenderer renderer = new CircleRenderer(gameObject, Color.BLUE, true);
+            gameObject.addBehaviour(renderer);
+        } else if (behaviour.getShape() instanceof Triangle) {
+            TriangleRenderer renderer = new TriangleRenderer(gameObject, Color.BLUE, true);
+            gameObject.addBehaviour(renderer);
+        } else if (behaviour.getShape() instanceof RotatedRectangle) {
+            RotatedRectangleRenderer renderer = new RotatedRectangleRenderer(gameObject, Color.BLUE, true);
+            gameObject.addBehaviour(renderer);
+        } else if (behaviour.getShape() instanceof ConvexPolygon) {
+            ConvexPolygonRenderer renderer = new ConvexPolygonRenderer(gameObject, Color.BLUE, true);
+            gameObject.addBehaviour(renderer);
+        }
     }
 }
