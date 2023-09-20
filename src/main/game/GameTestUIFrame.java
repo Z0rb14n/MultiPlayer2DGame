@@ -81,6 +81,7 @@ class GameTestUIFrame extends JFrame {
         @Override
         public void paintComponent(Graphics g) {
             super.paintComponent(g);
+            ((Graphics2D ) g).scale(0.25,0.25);
             GameControllerRenderer.render((Graphics2D) g, 0);
         }
 

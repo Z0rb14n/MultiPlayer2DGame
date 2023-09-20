@@ -53,7 +53,7 @@ public class MapLoader {
                         new Vec2D(Integer.parseInt(split[3]),Integer.parseInt(split[4])));
             } else if (split.length == 6) {
                 return new RotatedRectangle(new Vec2D(Integer.parseInt(split[1]),Integer.parseInt(split[2])),
-                        Integer.parseInt(split[3]),Integer.parseInt(split[4]), Integer.parseInt(split[5]));
+                        Integer.parseInt(split[3]),Integer.parseInt(split[4]), (float) Math.toRadians(Integer.parseInt(split[5])));
             } else {
                 throw new IllegalArgumentException("Needs 4-5 entries: " + line);
             }
