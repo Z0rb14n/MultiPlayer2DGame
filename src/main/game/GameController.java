@@ -85,25 +85,26 @@ public class GameController {
         }
     }
 
-    public GameObject[] loadMap(String file) {
+    public void loadMap(String file) {
         try {
             GameMap map = MapLoader.getFromFile(file);
-            if (map == null) return null;
+            if (map == null) return;
             GameObject[] objects = new GameObject[map.shapes.length];
             for (int i = 0; i < objects.length; i++) {
                 GameObject go = new GameObject();
                 PhysicsBehaviour behaviour = new PhysicsBehaviour(go, engine, map.shapes[i], true);
                 go.addBehaviour(behaviour);
                 objects[i] = go;
+                if (GlobalRenderToggle.enableRenderer) {
+                    GameControllerRenderer.addRenderer(go);
+                }
             }
             for (GameObject go : objects) {
                 hierarchy.addObject(go);
             }
             this.map = objects;
-            return objects;
         } catch (Exception ex) {
             ex.printStackTrace();
-            return null;
         }
     }
 

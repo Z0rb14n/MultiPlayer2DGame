@@ -1,6 +1,7 @@
 package ui.server;
 
 import game.GameLogger;
+import game.GlobalRenderToggle;
 import game.net.NetworkConstants;
 import game.net.UDPGameServer;
 
@@ -20,6 +21,7 @@ public class ServerCLI {
 
     private ServerCLI() {
         try {
+            GlobalRenderToggle.enableRenderer = false;
             server = new UDPGameServer("NewMap.txt");
             GameLogger.getDefault().log("Server started on port " + NetworkConstants.PORT, GameLogger.Category.GAME);
         } catch (IOException e) {

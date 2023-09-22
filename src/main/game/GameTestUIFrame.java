@@ -1,7 +1,5 @@
 package game;
 
-import engine.GameObject;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -47,10 +45,7 @@ class GameTestUIFrame extends JFrame {
             setBackground(Color.WHITE);
             player = controller.addVehicle(0);
 
-            GameObject[] map = GameController.getInstance().loadMap("/maps/NewMap.txt");
-            for (GameObject gameObject : map) {
-                GameControllerRenderer.addRenderer(gameObject);
-            }
+            GameController.getInstance().loadMap("/maps/NewMap.txt");
         }
 
         void update() {

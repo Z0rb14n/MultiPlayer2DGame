@@ -35,8 +35,10 @@ public class VehicleObject extends GameObject implements GameObjectBehaviour {
         behaviour = new PhysicsBehaviour(this,engine,triangle,false);
         behaviour.setCollisionMask(VEHICLE_COLLISION_MASK);
         addBehaviour(behaviour);
-        renderer = new RotatedTriangleRenderer(this, dead ? Color.MAGENTA : Color.RED, true);
-        addBehaviour(renderer);
+        if (GlobalRenderToggle.enableRenderer) {
+            renderer = new RotatedTriangleRenderer(this, dead ? Color.MAGENTA : Color.RED, true);
+            addBehaviour(renderer);
+        } else renderer = null;
         addBehaviour(this);
         this.id = id;
         this.dead = dead;
@@ -80,7 +82,7 @@ public class VehicleObject extends GameObject implements GameObjectBehaviour {
 
     public void setDead(boolean dead) {
         this.dead = dead;
-        renderer.setColor(dead ? Color.MAGENTA : Color.RED);
+        if (GlobalRenderToggle.enableRenderer) renderer.setColor(dead ? Color.MAGENTA : Color.RED);
     }
 
     @Override

@@ -28,8 +28,10 @@ public class BallObject extends GameObject implements GameObjectBehaviour {
         addBehaviour(behaviour);
         this.parent = node;
         addBehaviour(this);
-        CircleRenderer renderer = new CircleRenderer(this, Color.MAGENTA, false);
-        addBehaviour(renderer);
+        if (GlobalRenderToggle.enableRenderer) {
+            CircleRenderer renderer = new CircleRenderer(this, Color.MAGENTA, false);
+            addBehaviour(renderer);
+        }
         this.id = id;
         this.counter = bounceCount;
     }
