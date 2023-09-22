@@ -20,13 +20,15 @@ public class UDPGameServer implements UDPServerNetworkEventReceiver {
     private final UDPServer server;
     private final GameController controller = GameController.getInstance();
     private final Object lock = new Object[0];
+    private final String map;
     private int nextID = 0;
-    public UDPGameServer() throws IOException {
+    public UDPGameServer(String map) throws IOException {
         server = new UDPServer(NetworkConstants.PORT);
         server.addNetworkEventReceiver(this);
         InputPacket.ensureFactoryRegistered();
         RespawnRequestPacket.ensureFactoryRegistered();
-        controller.loadMap("/maps/NewMap.txt");
+        controller.loadMap("/maps/" + map);
+        this.map = map;
     }
 
     @Override
@@ -54,7 +56,7 @@ public class UDPGameServer implements UDPServerNetworkEventReceiver {
             }
             clients.put(id, new Pair<>(clientAddress, clientPort));
             clientIDs.put(new Pair<>(clientAddress, clientPort), id);
-            InitGameInfoPacket packet = new InitGameInfoPacket(id, ids2);
+            InitGameInfoPacket packet = new InitGameInfoPacket(id, ids2, map);
             server.writePacket(packet, clientAddress, clientPort);
             GameLogger.getDefault().log("Added new player: " + id, GameLogger.Category.GAME);
             controller.addVehicle(id);

@@ -1,6 +1,5 @@
 package ui.client;
 
-import engine.*;
 import game.*;
 import game.net.GameStatePacket;
 import game.net.InputPacket;
@@ -25,11 +24,6 @@ public class GamePanel extends JPanel implements KeyListener {
         super();
         setBackground(Color.WHITE);
         addKeyListener(this);
-
-        GameObject[] map = GameController.getInstance().loadMap("/maps/NewMap.txt");
-        for (GameObject gameObject : map) {
-            GameControllerRenderer.addRenderer(gameObject);
-        }
     }
 
     void signalGameStart() {

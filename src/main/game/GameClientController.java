@@ -1,5 +1,6 @@
 package game;
 
+import engine.GameObject;
 import game.net.ClientConnectPacket;
 import game.net.GameStatePacket;
 import game.net.InitGameInfoPacket;
@@ -54,6 +55,11 @@ public class GameClientController implements UDPClientNetworkEventReceiver {
             playerNumber = initPacket.getYourPlayerID();
             for (int i = 0; i < initPacket.getActivePlayers().length; i++) {
                 currentPlayers.add(i);
+            }
+            GameController.getInstance().unloadMap();
+            GameObject[] mapData = GameController.getInstance().loadMap("/maps/" + initPacket.getMapFile());
+            for (GameObject gameObject : mapData) {
+                GameControllerRenderer.addRenderer(gameObject);
             }
             client.addNetworkEventReceiver(this);
             return NetworkInstantiationResult.SUCCESS;

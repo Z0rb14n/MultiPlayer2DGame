@@ -32,7 +32,7 @@ public class TCPGameServer implements TCPServerNetworkEventReceiver {
         }
         clients.put(id,c);
         clientIDs.put(c,id);
-        InitGameInfoPacket packet = new InitGameInfoPacket(id, ids2);
+        InitGameInfoPacket packet = new InitGameInfoPacket(id, ids2, "NewMap.txt");
         c.writePacket(packet);
         controller.addVehicle(id);
     }

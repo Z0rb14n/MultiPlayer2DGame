@@ -1,8 +1,8 @@
 package ui.server;
 
 import game.GameLogger;
-import game.net.UDPGameServer;
 import game.net.NetworkConstants;
+import game.net.UDPGameServer;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -20,7 +20,7 @@ public class ServerCLI {
 
     private ServerCLI() {
         try {
-            server = new UDPGameServer();
+            server = new UDPGameServer("NewMap.txt");
             GameLogger.getDefault().log("Server started on port " + NetworkConstants.PORT, GameLogger.Category.GAME);
         } catch (IOException e) {
             e.printStackTrace();

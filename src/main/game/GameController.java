@@ -27,6 +27,7 @@ public class GameController {
     private final ArrayList<BallObject> balls = new ArrayList<>();
     private final SceneHierarchy hierarchy = new SceneHierarchy();
     private final Random random = new Random();
+    private GameObject[] map;
     private static int GAME_SPEED = 3;
     private static GameController singleton;
     public static GameController getInstance() {
@@ -77,6 +78,13 @@ public class GameController {
         vehicles.remove(id);
     }
 
+    public void unloadMap() {
+        if (map == null) return;
+        for (int i = 0; i < map.length; i++) {
+            hierarchy.removeObject(map[i]);
+        }
+    }
+
     public GameObject[] loadMap(String file) {
         try {
             GameMap map = MapLoader.getFromFile(file);
@@ -91,6 +99,7 @@ public class GameController {
             for (GameObject go : objects) {
                 hierarchy.addObject(go);
             }
+            this.map = objects;
             return objects;
         } catch (Exception ex) {
             ex.printStackTrace();
