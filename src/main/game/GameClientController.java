@@ -11,6 +11,7 @@ import ui.client.GameFrame;
 
 import java.io.IOException;
 import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 
 public class GameClientController implements UDPClientNetworkEventReceiver {
@@ -35,7 +36,7 @@ public class GameClientController implements UDPClientNetworkEventReceiver {
             client.writePacket(new ClientConnectPacket("funny"));
             InitGameInfoPacket.ensureFactoryInitialized();
             GameStatePacket.registerFactory();
-            ByteSerializable packet = spinReadPacket(500);
+            ByteSerializable packet = spinReadPacket(30);
             if (packet == null) {
                 GameLogger.getDefault().log("Packet was null.", GameLogger.Category.NETWORK);
                 client.stop();
@@ -69,6 +70,8 @@ public class GameClientController implements UDPClientNetworkEventReceiver {
                 ex.printStackTrace();
                 return NetworkInstantiationResult.FAILURE;
             }
+        } catch (UnknownHostException ex) {
+            return NetworkInstantiationResult.INVALID_INPUT;
         } catch (IOException ex) {
             ex.printStackTrace();
             return NetworkInstantiationResult.FAILURE;
@@ -116,6 +119,6 @@ public class GameClientController implements UDPClientNetworkEventReceiver {
     }
 
     public enum NetworkInstantiationResult {
-        SUCCESS, FAILURE, TIMEOUT, ALREADY_CONNECTED
+        SUCCESS, INVALID_INPUT, FAILURE, TIMEOUT, ALREADY_CONNECTED
     }
 }

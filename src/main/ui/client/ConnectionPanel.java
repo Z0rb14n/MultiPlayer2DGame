@@ -15,6 +15,7 @@ import java.awt.*;
 class ConnectionPanel extends JPanel {
     private final static String CONNECTION_TIMEOUT = "Timed out.";
     private final static String DEFAULT_COULD_NOT_CONNECT = "Could not connect.";
+    private final static String INVALID_HOSTNAME = "Unknown host: ";
     private static final Font font = new Font("Arial", Font.PLAIN, 24);
     private final IPEnterBox ipBox;
     private final JButton ipEnterButton = new JButton("Connect");
@@ -69,6 +70,10 @@ class ConnectionPanel extends JPanel {
             case TIMEOUT:
                 GameLogger.getDefault().log("Connection timed out.");
                 updateErrorDisplayed(CONNECTION_TIMEOUT);
+                break;
+            case INVALID_INPUT:
+                GameLogger.getDefault().log("Unknown host: " + ip);
+                updateErrorDisplayed(INVALID_HOSTNAME + ip);
                 break;
             default:
                 updateErrorDisplayed(DEFAULT_COULD_NOT_CONNECT);
